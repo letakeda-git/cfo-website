@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login • CFO</title>
+    <meta name="description" content="Área de administração do Clube Futsal de Oeiras." />
+    <link rel="icon" type="image/x-icon" href="./favicon_io/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon_io/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon_io/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon_io/favicon-16x16.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <!-- API Client -->
+    <script src="./api-client.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a href="./index.html" class="logo">
+          <img src="./public/logo-cfo.png" alt="Logótipo do CF Oeiras" />
+          <span>Clube Futsal de Oeiras</span>
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section class="contact" id="login">
+        <div class="container">
+          <h2>Área de Administração</h2>
+          <p class="section-sub">Introduza as suas credenciais para continuar.</p>
+          <form class="card contact-form" name="login" onsubmit="return handleLogin(event)">
+            <div id="error-message" class="error-message" style="display: none;"></div>
+            <div id="success-message" class="success-message" style="display: none;"></div>
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" placeholder="voce@empresa.com" required />
+            </label>
+            <label>
+              <span>Palavra-passe</span>
+              <input type="password" name="password" placeholder="A sua palavra-passe" required />
+            </label>
+            <button type="submit" class="btn" id="login-btn">
+              <span id="btn-text">Entrar</span>
+              <span id="btn-loading" style="display: none;">A autenticar...</span>
+            </button>
+          </form>
+          
+          <!-- New Password Form (hidden by default) -->
+          <form class="card contact-form" name="newPassword" id="new-password-form" onsubmit="return handleNewPassword(event)" style="display: none;">
+            <div id="new-password-error" class="error-message" style="display: none;"></div>
+            <div id="new-password-success" class="success-message" style="display: none;"></div>
+            <h3>Definir Nova Palavra-passe</h3>
+            <p>É necessário definir uma nova palavra-passe para continuar.</p>
+            <label>
+              <span>Nova Palavra-passe</span>
+              <input type="password" name="newPassword" placeholder="Nova palavra-passe" required />
+            </label>
+            <label>
+              <span>Confirmar Palavra-passe</span>
+              <input type="password" name="confirmPassword" placeholder="Confirmar palavra-passe" required />
+            </label>
+            <button type="submit" class="btn" id="new-password-btn">
+              <span id="new-password-btn-text">Definir Palavra-passe</span>
+              <span id="new-password-btn-loading" style="display: none;">A definir...</span>
+            </button>
+            <button type="button" class="btn btn-outline" onclick="showLoginForm()">Voltar ao Login</button>
+          </form>
+          <p style="margin-top: 1rem;"><a href="./index.html" class="btn btn-outline">Voltar ao site</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> CFO. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script>
+    async function handleLogin(event) {
+      event.preventDefault();
+      
+      // Check if apiClient is available
+      if (typeof window.apiClient === 'undefined') {
+        showError('Cliente API não carregado. Recarregue a página.');
+        return false;
+      }
+      
+      const form = event.target;
+      const email = form.email.value.trim();
+      const password = form.password.value.trim();
+      
+      if (!email || !password) {
+        showError('Por favor, preencha todos os campos.');
+        return false;
+      }
+
+      // Show loading state
+      setLoadingState(true);
+      hideMessages();
+
+      try {
+        // Authenticate with API
+        const result = await window.apiClient.login(email, password);
+        
+        if (result.success) {
+          showSuccess('Login realizado com sucesso! A redirecionar...');
+          
+          // Redirect to admin dashboard after successful login
+          setTimeout(() => {
+            window.location.href = './admin.html';
+          }, 1500);
+        } else {
+          // Check if it's a new password challenge
+          if (result.challenge === 'NEW_PASSWORD_REQUIRED') {
+            showNewPasswordForm();
+          } else {
+            showError(result.error || 'Erro de autenticação. Tente novamente.');
+          }
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showError('Erro de conexão. Tente novamente.');
+      } finally {
+        setLoadingState(false);
+      }
+
+      return false;
+    }
+
+    function setLoadingState(loading) {
+      const btn = document.getElementById('login-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnLoading = document.getElementById('btn-loading');
+      
+      if (loading) {
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline';
+      } else {
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      
+      const successDiv = document.getElementById('success-message');
+      successDiv.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('success-message');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.style.display = 'none';
+    }
+
+    function hideMessages() {
+      document.getElementById('error-message').style.display = 'none';
+      document.getElementById('success-message').style.display = 'none';
+    }
+
+    function showNewPasswordForm() {
+      document.querySelector('form[name="login"]').style.display = 'none';
+      document.getElementById('new-password-form').style.display = 'block';
+      hideMessages();
+    }
+
+    function showLoginForm() {
+      document.querySelector('form[name="login"]').style.display = 'block';
+      document.getElementById('new-password-form').style.display = 'none';
+      hideMessages();
+    }
+
+    async function handleNewPassword(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const newPassword = form.newPassword.value.trim();
+      const confirmPassword = form.confirmPassword.value.trim();
+      
+      if (!newPassword || !confirmPassword) {
+        showNewPasswordError('Por favor, preencha todos os campos.');
+        return false;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        showNewPasswordError('As palavras-passe não coincidem.');
+        return false;
+      }
+      
+      if (newPassword.length < 8) {
+        showNewPasswordError('A palavra-passe deve ter pelo menos 8 caracteres.');
+        return false;
+      }
+
+      // Show loading state
+      setNewPasswordLoadingState(true);
+      hideNewPasswordMessages();
+
+      try {
+        // Get session data from localStorage
+        const sessionData = localStorage.getItem('cognitoSession');
+        if (!sessionData) {
+          showNewPasswordError('Sessão expirada. Faça login novamente.');
+          return false;
+        }
+        
+        const { username, session } = JSON.parse(sessionData);
+        const result = await window.apiClient.setNewPassword(username, newPassword, session);
+        
+        if (result.success) {
+          showNewPasswordSuccess('Palavra-passe definida com sucesso! A redirecionar...');
+          
+          // Redirect to admin dashboard
+          setTimeout(() => {
+            window.location.href = './admin.html';
+          }, 1500);
+        } else {
+          showNewPasswordError(result.error || 'Erro ao definir palavra-passe. Tente novamente.');
+        }
+      } catch (error) {
+        console.error('New password error:', error);
+        showNewPasswordError('Erro de conexão. Tente novamente.');
+      } finally {
+        setNewPasswordLoadingState(false);
+      }
+
+      return false;
+    }
+
+    function setNewPasswordLoadingState(loading) {
+      const btn = document.getElementById('new-password-btn');
+      const btnText = document.getElementById('new-password-btn-text');
+      const btnLoading = document.getElementById('new-password-btn-loading');
+      
+      if (loading) {
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline';
+      } else {
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+      }
+    }
+
+    function showNewPasswordError(message) {
+      const errorDiv = document.getElementById('new-password-error');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      
+      const successDiv = document.getElementById('new-password-success');
+      successDiv.style.display = 'none';
+    }
+
+    function showNewPasswordSuccess(message) {
+      const successDiv = document.getElementById('new-password-success');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      
+      const errorDiv = document.getElementById('new-password-error');
+      errorDiv.style.display = 'none';
+    }
+
+    function hideNewPasswordMessages() {
+      document.getElementById('new-password-error').style.display = 'none';
+      document.getElementById('new-password-success').style.display = 'none';
+    }
+
+    // Check if user is already authenticated
+    function checkAuthStatus() {
+      if (window.apiClient && window.apiClient.token) {
+        showSuccess('Já está autenticado. A redirecionar...');
+        setTimeout(() => {
+          window.location.href = './admin.html';
+        }, 1000);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+      
+      // Debug: Check if API Client is available
+      console.log('API Client available:', typeof window.apiClient !== 'undefined');
+      
+      // Check authentication status on page load
+      if (typeof window.apiClient !== 'undefined') {
+        checkAuthStatus();
+      } else {
+        console.error('API Client not loaded. Check if api-client.js is accessible.');
+        showError('Erro ao carregar o cliente API. Recarregue a página.');
+      }
+    });
+    </script>
+  </body>
+  </html>
+
+
+
