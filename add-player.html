@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adicionar Jogador • CFO</title>
+    <meta name="description" content="Adicionar novo jogador ao Clube Futsal de Oeiras." />
+    <link rel="icon" type="image/x-icon" href="./favicon_io/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon_io/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon_io/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon_io/favicon-16x16.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <!-- API Client -->
+    <script src="./api-client.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a href="./admin.html" class="logo">
+          <img src="./public/logo-cfo.png" alt="Logótipo do CF Oeiras" />
+          <span>Clube Futsal de Oeiras</span>
+        </a>
+        <div>
+          <span id="user-info" class="user-info"></span>
+          <button onclick="logout()" class="btn btn-outline btn-small">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <h1>Adicionar Jogador</h1>
+          <p class="section-sub">Preencha os dados do novo jogador para adicionar à equipa.</p>
+        </div>
+      </section>
+
+      <section class="contact">
+        <div class="container">
+          <form class="card contact-form" name="addPlayer" onsubmit="return handleAddPlayer(event)">
+            <div id="error-message" class="error-message" style="display: none;"></div>
+            <div id="success-message" class="success-message" style="display: none;"></div>
+            
+            <div class="grid-2">
+              <label>
+                <span>Nome Completo</span>
+                <input type="text" name="name" placeholder="Nome do jogador" required />
+              </label>
+              <label>
+                <span>Idade</span>
+                <input type="number" name="age" placeholder="Idade" min="1" max="100" required />
+              </label>
+            </div>
+            
+            <div class="grid-2">
+              <label>
+                <span>Equipa</span>
+                <select name="team" required>
+                  <option value="">Selecionar equipa</option>
+                  <option value="Benjamins">Benjamins</option>
+                  <option value="Infantis">Infantis</option>
+                  <option value="Iniciados">Iniciados</option>
+                  <option value="Juvenis">Juvenis</option>
+                  <option value="Juniores">Juniores</option>
+                  <option value="Seniores">Seniores</option>
+                </select>
+              </label>
+              <label>
+                <span>Número da Camisola</span>
+                <input type="number" name="jerseyNumber" placeholder="Ex: 10" min="1" max="99" />
+              </label>
+            </div>
+            
+            <div class="grid-2">
+              <label>
+                <span>Número de Telemóvel</span>
+                <input type="tel" name="mobile" placeholder="912 345 678" required />
+              </label>
+              <label>
+                <span>Email</span>
+                <input type="email" name="email" placeholder="jogador@exemplo.com" />
+              </label>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn" id="submit-btn">
+                <span id="btn-text">Adicionar Jogador</span>
+                <span id="btn-loading" style="display: none;">A adicionar...</span>
+              </button>
+              <a href="./admin.html" class="btn btn-outline">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> CFO. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script>
+    function logout() {
+      if (window.apiClient) {
+        window.apiClient.clearToken();
+      }
+      window.location.href = './login.html';
+    }
+
+    function checkAuth() {
+      if (!window.apiClient || !window.apiClient.token) {
+        window.location.href = './login.html';
+        return;
+      }
+
+      // Display user information
+      const userInfo = { email: 'Admin' }; // Simplified for now
+      const userInfoEl = document.getElementById('user-info');
+      if (userInfo && userInfoEl) {
+        userInfoEl.textContent = `Olá, ${userInfo.email}`;
+      }
+    }
+
+    async function handleAddPlayer(event) {
+      event.preventDefault();
+      
+              const form = event.target;
+              const name = form.name.value.trim();
+              const age = form.age.value.trim();
+              const team = form.team.value.trim();
+              const jerseyNumber = form.jerseyNumber.value.trim();
+              const mobile = form.mobile.value.trim();
+              const email = form.email.value.trim();
+
+              if (!name || !age || !team || !mobile) {
+                showError('Por favor, preencha todos os campos obrigatórios.');
+                return false;
+              }
+
+      // Show loading state
+      setLoadingState(true);
+      hideMessages();
+
+      try {
+        // Save player to DynamoDB
+                const playerData = {
+                  name: name,
+                  age: age,
+                  team: team,
+                  jerseyNumber: jerseyNumber || null,
+                  mobile: mobile,
+                  email: email || null
+                };
+
+        const result = await window.apiClient.addPlayer(playerData);
+        
+        if (result.success) {
+          showSuccess(result.message);
+          
+          // Clear form
+          form.reset();
+          
+          // Redirect to admin page after 2 seconds
+          setTimeout(() => {
+            window.location.href = './admin.html';
+          }, 2000);
+        } else {
+          showError(result.error || 'Erro ao adicionar jogador. Tente novamente.');
+        }
+        
+      } catch (error) {
+        console.error('Error adding player:', error);
+        showError('Erro de conexão. Tente novamente.');
+      } finally {
+        setLoadingState(false);
+      }
+
+      return false;
+    }
+
+    function setLoadingState(loading) {
+      const btn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnLoading = document.getElementById('btn-loading');
+      
+      if (loading) {
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline';
+      } else {
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      
+      const successDiv = document.getElementById('success-message');
+      successDiv.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('success-message');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.style.display = 'none';
+    }
+
+    function hideMessages() {
+      document.getElementById('error-message').style.display = 'none';
+      document.getElementById('success-message').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+      
+      checkAuth();
+    });
+    </script>
+  </body>
+</html>
