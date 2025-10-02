@@ -16,17 +16,25 @@ const { upload, uploadMultipleToS3, deleteFromS3 } = require('./config/s3');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Environment variable validation
+const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_REGION'];
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+if (missingVars.length > 0) {
+  console.warn(`⚠️  Missing environment variables: ${missingVars.join(', ')}`);
+  console.warn('Some features may not work properly.');
+}
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      styleSrc: ["'self'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrcAttr: ["'unsafe-inline'"],
-      connectSrc: ["'self'"]
+      scriptSrc: ["'self'"],
+      connectSrc: ["'self'"],
+      formAction: ["'self'"]
     }
   }
 }));
@@ -79,10 +87,7 @@ async function sendContactEmail(name, email, message) {
   
   // Check if AWS credentials are configured
   if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
-    console.log('AWS SES not configured. Contact form submission logged:');
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Message:', message);
+    console.log('AWS SES not configured. Contact form submission received.');
     console.log('To configure email sending, see AWS-SES-SETUP.md');
     return { MessageId: 'logged-to-console' };
   }
@@ -134,10 +139,7 @@ This message was sent from the Agatha Oeiras website contact form.
   } catch (error) {
     console.error('Error sending email:', error);
     // Log the contact form submission even if email fails
-    console.log('Contact form submission (email failed):');
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Message:', message);
+    console.log('Contact form submission (email failed)');
     
     // Check if it's a verification error
     if (error.name === 'MessageRejected' && error.message.includes('not verified')) {
@@ -161,7 +163,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session configuration for cart
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'agatha-oeiras-ceramics-secret-key',
+  secret: process.env.SESSION_SECRET || require('crypto').randomBytes(64).toString('hex'),
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
@@ -793,10 +795,7 @@ app.post('/contact', async (req, res) => {
     
     if (error.name === 'MessageRejected' && error.message.includes('not verified')) {
       errorMessage = 'Email service is being configured. Your message has been logged and we will respond soon.';
-      console.log('📧 Contact form submission logged (SES verification pending):');
-      console.log('   Name:', req.body.name);
-      console.log('   Email:', req.body.email);
-      console.log('   Message:', req.body.message);
+      console.log('📧 Contact form submission logged (SES verification pending)');
     }
     
     res.render('contact', { 

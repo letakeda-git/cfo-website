@@ -240,7 +240,7 @@
             
             <div class="form-group">
                 <label for="imageFiles">Upload Images (Multiple)</label>
-                <input type="file" id="imageFiles" name="imageFiles" accept="image/*" multiple onchange="previewImages(this)" required>
+                <input type="file" id="imageFiles" name="imageFiles" accept="image/*" multiple required>
                 <small class="form-help">Supported formats: JPG, PNG, GIF, WebP (Max 5MB each). You can select multiple files. The first image will be the main product image.</small>
                 <div class="images-preview" id="imagesPreview" style="display: none;">
                     <div class="preview-grid" id="previewGrid"></div>
@@ -264,38 +264,18 @@
         </form>
     </div>
 
+    <script src="/js/admin.js"></script>
     <script>
-        // Image input toggle function removed - only uploads allowed
-
-        function previewImages(input) {
-            const previewGrid = document.getElementById('previewGrid');
-            const imagesPreview = document.getElementById('imagesPreview');
-            
-            // Clear previous previews
-            previewGrid.innerHTML = '';
-            
-            if (input.files && input.files.length > 0) {
-                imagesPreview.style.display = 'block';
-                
-                Array.from(input.files).forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const previewItem = document.createElement('div');
-                        previewItem.className = 'preview-item';
-                        previewItem.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview ${index + 1}">
-                            <span class="preview-label">Image ${index + 1}</span>
-                        `;
-                        previewGrid.appendChild(previewItem);
-                    };
-                    reader.readAsDataURL(file);
+        // Initialize file input event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageFiles = document.getElementById('imageFiles');
+            if (imageFiles) {
+                imageFiles.addEventListener('change', function() {
+                    previewImages(this);
                 });
-            } else {
-                imagesPreview.style.display = 'none';
             }
-        }
-
-        // URL preview functionality removed - upload only
+        });
+    </script>
 
         // Form submission
         document.getElementById('addProductForm').addEventListener('submit', async function(e) {
