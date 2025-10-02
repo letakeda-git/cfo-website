@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Agatha Oeiras</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .admin-header {
+            background: #333;
+            color: white;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+        .admin-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .admin-user {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+        }
+        .btn-admin-secondary {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-admin-secondary:hover {
+            background: white;
+            color: #333;
+        }
+        .admin-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        .admin-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .admin-section-header {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .admin-section-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        .admin-section-content {
+            padding: 1.5rem;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .product-card-admin {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card-admin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .product-image-admin {
+            height: 200px;
+            overflow: hidden;
+        }
+        .product-image-admin img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-info-admin {
+            padding: 1rem;
+        }
+        .product-info-admin h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+        .product-info-admin p {
+            margin: 0 0 1rem 0;
+            color: #666;
+        }
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-edit, .btn-delete {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .btn-edit {
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-edit:hover {
+            background: #0056b3;
+            color: white;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        .add-product-form {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #333;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .btn-add-product {
+            background: #28a745;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-add-product:hover {
+            background: #218838;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-header h3 {
+            margin: 0;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .form-help {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: #666;
+        }
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .quick-actions .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+        .quick-actions .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .quick-actions .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .quick-actions .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .quick-actions .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .quick-actions {
+                flex-direction: column;
+            }
+            .quick-actions .btn {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="container">
+            <div class="admin-title">Admin Dashboard</div>
+            <div class="admin-actions">
+                <span class="admin-user">Welcome, <%= username || 'Admin' %></span>
+                <a href="/" class="btn-admin-secondary">View Store</a>
+                <form method="POST" action="/admin/logout" style="display: inline;">
+                    <button type="submit" class="btn-admin-secondary">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <!-- Quick Actions Section -->
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <h2>Quick Actions</h2>
+            </div>
+            <div class="admin-section-content">
+                <div class="quick-actions">
+                    <a href="/admin/products/add" class="btn btn-primary btn-large">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add New Product
+                    </a>
+                    <a href="/admin/about/edit" class="btn btn-outline btn-large">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Edit About Page
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Management Section -->
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <h2>Manage Products</h2>
+            </div>
+            <div class="admin-section-content">
+                <div class="products-grid">
+                    <% ceramics.forEach(function(product) { %>
+                    <div class="product-card-admin">
+                        <div class="product-image-admin">
+                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                        </div>
+                        <div class="product-info-admin">
+                            <h3><%= product.name %></h3>
+                            <p><strong>€<%= product.price %></strong> • <%= product.category %></p>
+                            <p><%= product.description %></p>
+                            <div class="product-actions">
+                                <a href="/admin/products/<%= product.id %>/edit" class="btn-edit">Edit</a>
+                                <button class="btn-delete" onclick="deleteProduct(<%= product.id %>)">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Product</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="editProductForm" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editName">Product Name</label>
+                        <input type="text" id="editName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPrice">Price</label>
+                        <input type="number" id="editPrice" name="price" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editCategory">Category</label>
+                        <select id="editCategory" name="category" required>
+                            <option value="bowls">Bowls</option>
+                            <option value="vases">Vases</option>
+                            <option value="mugs">Mugs</option>
+                            <option value="plates">Plates</option>
+                            <option value="cups">Cups</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editImageType">Image Source</label>
+                        <select id="editImageType" name="imageType" onchange="toggleEditImageInput()">
+                            <option value="upload">Upload New Image</option>
+                            <option value="url">Image URL</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" id="editImageUploadGroup">
+                    <label for="editImageFile">Upload New Image</label>
+                    <input type="file" id="editImageFile" name="imageFile" accept="image/*">
+                    <small class="form-help">Supported formats: JPG, PNG, GIF, WebP (Max 5MB)</small>
+                </div>
+                <div class="form-group" id="editImageUrlGroup" style="display: none;">
+                    <label for="editImageUrl">Image URL</label>
+                    <input type="url" id="editImageUrl" name="imageUrl">
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Description</label>
+                    <textarea id="editDescription" name="description" required></textarea>
+                </div>
+                <button type="submit" class="btn-add-product">Update Product</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentProductId = null;
+
+
+        function toggleEditImageInput() {
+            const imageType = document.getElementById('editImageType').value;
+            const uploadGroup = document.getElementById('editImageUploadGroup');
+            const urlGroup = document.getElementById('editImageUrlGroup');
+            
+            if (imageType === 'upload') {
+                uploadGroup.style.display = 'block';
+                urlGroup.style.display = 'none';
+                document.getElementById('editImageFile').required = true;
+                document.getElementById('editImageUrl').required = false;
+            } else {
+                uploadGroup.style.display = 'none';
+                urlGroup.style.display = 'block';
+                document.getElementById('editImageFile').required = false;
+                document.getElementById('editImageUrl').required = true;
+            }
+        }
+
+
+        // Edit Product
+        function editProduct(productId) {
+            // Find product data from the page
+            const productCards = document.querySelectorAll('.product-card-admin');
+            let productData = null;
+            
+            productCards.forEach(card => {
+                const editBtn = card.querySelector('.btn-edit');
+                if (editBtn.onclick.toString().includes(productId)) {
+                    const name = card.querySelector('h3').textContent;
+                    const price = card.querySelector('p strong').textContent.replace('€', '');
+                    const category = card.querySelector('p').textContent.split('•')[1].trim();
+                    const description = card.querySelectorAll('p')[1].textContent;
+                    const image = card.querySelector('img').src;
+                    
+                    productData = { name, price, category, description, image };
+                }
+            });
+            
+            if (productData) {
+                currentProductId = productId;
+                document.getElementById('editName').value = productData.name;
+                document.getElementById('editPrice').value = productData.price;
+                document.getElementById('editCategory').value = productData.category;
+                document.getElementById('editImageUrl').value = productData.image;
+                document.getElementById('editDescription').value = productData.description;
+                
+                // Set to URL mode and show current image
+                document.getElementById('editImageType').value = 'url';
+                toggleEditImageInput();
+                
+                document.getElementById('editModal').style.display = 'block';
+            }
+        }
+
+        // Update Product Form
+        document.getElementById('editProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch(`/admin/products/${currentProductId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error updating product');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error updating product');
+            }
+        });
+
+        // Delete Product
+        async function deleteProduct(productId) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                try {
+                    const response = await fetch(`/admin/products/${productId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting product');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error deleting product');
+                }
+            }
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

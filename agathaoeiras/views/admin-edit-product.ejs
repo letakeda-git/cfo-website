@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product - Admin</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .admin-header h1 {
+            margin: 0;
+            color: #333;
+        }
+        .back-btn {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        .back-btn:hover {
+            color: #333;
+        }
+        .edit-product-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-help {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        .btn-save {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .btn-save:hover {
+            background: #0056b3;
+        }
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .btn-cancel:hover {
+            background: #545b62;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #f5c6cb;
+        }
+        .product-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .detail-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        .detail-item label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .images-preview {
+            margin-top: 1rem;
+        }
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .preview-item {
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: #f9f9f9;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .preview-label {
+            font-size: 0.8rem;
+            color: #666;
+            display: block;
+        }
+        .current-image {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+        .current-image p {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Edit Product</h1>
+            <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+        </div>
+
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="success-message">
+                Product updated successfully!
+            </div>
+        <% } %>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <% if (product) { %>
+            <form class="edit-product-form" id="editProductForm" method="POST" action="/admin/products/<%= product.id %>" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Product Name</label>
+                        <input type="text" id="name" name="name" value="<%= product.name %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price (€)</label>
+                        <input type="number" id="price" name="price" value="<%= product.price %>" step="0.01" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="imageFiles">Upload Images (Multiple)</label>
+                    <input type="file" id="imageFiles" name="imageFiles" accept="image/*" multiple onchange="previewImages(this)">
+                    <div class="form-help">Supported formats: JPG, PNG, GIF, WebP (Max 5MB each). You can select multiple files. The first image will be the main product image.</div>
+                    <div class="images-preview" id="imagesPreview" style="display: none;">
+                        <div class="preview-grid" id="previewGrid"></div>
+                    </div>
+                    <% if (product.image) { %>
+                        <div class="current-image">
+                            <p><strong>Current main image:</strong></p>
+                            <img src="<%= product.image %>" alt="Current product image" class="image-preview">
+                        </div>
+                    <% } %>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" required placeholder="Describe the product..."><%= product.description %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="productDetails">Product Details</label>
+                    <textarea id="productDetails" name="productDetails" rows="4" placeholder="Enter product details (e.g., Handcrafted ceramic, Food safe glaze, Dishwasher safe, Unique piece - slight variations may occur)"><%= product.productDetails || '' %></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">Update Product</button>
+                    <button type="button" class="btn-cancel" onclick="window.location.href='/dashboard'">Cancel</button>
+                </div>
+            </form>
+        <% } else { %>
+            <div class="error-message">
+                Product not found or failed to load.
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        function previewImages(input) {
+            const previewGrid = document.getElementById('previewGrid');
+            const imagesPreview = document.getElementById('imagesPreview');
+            
+            // Clear previous previews
+            previewGrid.innerHTML = '';
+            
+            if (input.files && input.files.length > 0) {
+                imagesPreview.style.display = 'block';
+                
+                Array.from(input.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'preview-item';
+                        previewItem.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview ${index + 1}">
+                            <span class="preview-label">Image ${index + 1}</span>
+                        `;
+                        previewGrid.appendChild(previewItem);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                imagesPreview.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

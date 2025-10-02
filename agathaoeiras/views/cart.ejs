@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Agatha Oeiras</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">Agatha Oeiras</a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/products" class="nav-link">Products</a></li>
+                <li><a href="/about" class="nav-link">About</a></li>
+                <li><a href="/contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-cart">
+                <a href="/cart" class="cart-link">
+                    <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h8.5M9.5 18a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8.5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                    </svg>
+                    <span class="cart-count" id="cart-count"><%= cartItemCount || 0 %></span>
+                </a>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="cart-hero">
+            <div class="container">
+                <h1>Shopping Cart</h1>
+                <p>Review your selected ceramics</p>
+            </div>
+        </section>
+
+        <section class="cart-content">
+            <div class="container">
+                <% if (cart && cart.length > 0) { %>
+                    <div class="cart-items">
+                        <% cart.forEach(function(item) { %>
+                            <div class="cart-item" data-product-id="<%= item.id %>">
+                                <div class="cart-item-image">
+                                    <img src="<%= item.image %>" alt="<%= item.name %>">
+                                </div>
+                                <div class="cart-item-details">
+                                    <h3><%= item.name %></h3>
+                                    <p class="cart-item-price">€<%= item.price %></p>
+                                    <p class="cart-item-quantity-text">Quantity: <%= item.quantity %></p>
+                                </div>
+                                <div class="cart-item-total">
+                                    <span class="item-total">€<%= (item.price * item.quantity).toFixed(2) %></span>
+                                </div>
+                                <div class="cart-item-actions">
+                                    <button class="remove-btn" data-product-id="<%= item.id %>">Remove</button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+
+                    <div class="cart-summary">
+                        <div class="summary-card">
+                            <h3>Order Summary</h3>
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">€<%= cartTotal.toFixed(2) %></span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Shipping:</span>
+                                <span>Free</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="total">€<%= cartTotal.toFixed(2) %></span>
+                            </div>
+                            <div class="cart-actions">
+                                <button class="btn btn-outline" id="clear-cart">Clear Cart</button>
+                                <button class="btn btn-primary" id="checkout-btn">Proceed to Checkout</button>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="empty-cart">
+                        <div class="empty-cart-content">
+                            <h2>Your cart is empty</h2>
+                            <p>Add some beautiful ceramics to your cart to get started.</p>
+                            <a href="/products" class="btn btn-primary">Shop Now</a>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Agatha Oeiras</h3>
+                    <p>Handcrafted ceramics for modern living</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>agatha.abdala@hotmail.com</p>
+                    <p>+351 967 799 032</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Agatha Oeiras. All rights reserved. | <a href="/admin/login" class="admin-footer-link">Admin</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+    <script src="/js/cart.js"></script>
+</body>
+</html>
+

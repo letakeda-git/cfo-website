@@ -1,0 +1,46 @@
+# Elastic Beanstalk ignore file
+# Files and directories to exclude from deployment
+
+# Development files
+.env
+*.log
+*.tmp
+*.temp
+
+# Node modules (will be installed on server)
+# node_modules/
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Documentation
+*.md
+!README.md
+
+# Scripts
+scripts/
+create-*.js
+test-*.js
+
+# Uploads (will be handled by S3 in production)
+public/uploads/
+
+# AWS configuration files
+.aws/

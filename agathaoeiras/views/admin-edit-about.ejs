@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit About Page - Admin - Agatha Oeiras</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .admin-header h1 {
+            margin: 0;
+            color: #333;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+        .back-btn:hover {
+            background: #5a6268;
+        }
+        .edit-about-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn-save:hover {
+            background: #218838;
+        }
+        .btn-preview {
+            background: #17a2b8;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-left: 1rem;
+        }
+        .btn-preview:hover {
+            background: #138496;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .preview-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        .preview-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Edit About Page</h1>
+            <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+        </div>
+
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="success-message">
+                About page updated successfully!
+            </div>
+        <% } %>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form class="edit-about-form" id="editAboutForm" method="POST" action="/admin/about/update">
+            <div class="form-group">
+                <label for="heroTitle">Hero Title</label>
+                <input type="text" id="heroTitle" name="heroTitle" value="<%= aboutContent.heroTitle || 'About Our Ceramics' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="heroSubtitle">Hero Subtitle</label>
+                <textarea id="heroSubtitle" name="heroSubtitle" required><%= aboutContent.heroSubtitle || 'Discover the story behind our handcrafted pieces' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="philosophyTitle">Philosophy Title</label>
+                <input type="text" id="philosophyTitle" name="philosophyTitle" value="<%= aboutContent.philosophyTitle || 'Our Philosophy' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="philosophyContent">Philosophy Content</label>
+                <textarea id="philosophyContent" name="philosophyContent" required><%= aboutContent.philosophyContent || 'We believe that the objects we use daily should be beautiful, functional, and made with care. Our ceramics are created using traditional techniques passed down through generations, combined with a modern minimalist aesthetic.' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="philosophyContent2">Philosophy Content (Second Paragraph)</label>
+                <textarea id="philosophyContent2" name="philosophyContent2" required><%= aboutContent.philosophyContent2 || 'Each piece is hand-thrown and glazed by our skilled artisans, ensuring that no two items are exactly alike. This uniqueness is what makes our ceramics special - they\'re not just objects, but companions in your daily rituals.' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="processTitle">Process Title</label>
+                <input type="text" id="processTitle" name="processTitle" value="<%= aboutContent.processTitle || 'Our Process' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="processContent">Process Content</label>
+                <textarea id="processContent" name="processContent" required><%= aboutContent.processContent || 'From selecting the finest clay to the final firing, every step in our process is carefully considered. We use sustainable practices and locally sourced materials whenever possible, ensuring that our ceramics are not only beautiful but also environmentally conscious.' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="processImageAlt">Process Image Alt Text</label>
+                <input type="text" id="processImageAlt" name="processImageAlt" value="<%= aboutContent.processImageAlt || 'Ceramics making process' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="valuesTitle">Values Title</label>
+                <input type="text" id="valuesTitle" name="valuesTitle" value="<%= aboutContent.valuesTitle || 'Our Values' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="qualityTitle">Quality Title</label>
+                <input type="text" id="qualityTitle" name="qualityTitle" value="<%= aboutContent.qualityTitle || 'Quality' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="qualityContent">Quality Content</label>
+                <textarea id="qualityContent" name="qualityContent" required><%= aboutContent.qualityContent || 'We use only the finest materials and techniques to ensure every piece meets our high standards.' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="sustainabilityTitle">Sustainability Title</label>
+                <input type="text" id="sustainabilityTitle" name="sustainabilityTitle" value="<%= aboutContent.sustainabilityTitle || 'Sustainability' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="sustainabilityContent">Sustainability Content</label>
+                <textarea id="sustainabilityContent" name="sustainabilityContent" required><%= aboutContent.sustainabilityContent || 'Our commitment to sustainable practices means our ceramics are made with respect for the environment.' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="authenticityTitle">Authenticity Title</label>
+                <input type="text" id="authenticityTitle" name="authenticityTitle" value="<%= aboutContent.authenticityTitle || 'Authenticity' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="authenticityContent">Authenticity Content</label>
+                <textarea id="authenticityContent" name="authenticityContent" required><%= aboutContent.authenticityContent || 'Each piece is handcrafted, making it unique and authentic - no mass production here.' %></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-save">Save Changes</button>
+                <button type="button" class="btn-preview" onclick="previewAbout()">Preview</button>
+            </div>
+        </form>
+
+        <div class="preview-section" id="previewSection" style="display: none;">
+            <h3>Preview</h3>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+
+    <script>
+        function previewAbout() {
+            const form = document.getElementById('editAboutForm');
+            const formData = new FormData(form);
+            
+            const previewContent = document.getElementById('previewContent');
+            const previewSection = document.getElementById('previewSection');
+            
+            // Build preview HTML
+            const previewHTML = `
+                <div class="hero-section">
+                    <h1>${formData.get('heroTitle')}</h1>
+                    <p>${formData.get('heroSubtitle')}</p>
+                </div>
+                <div class="story-section">
+                    <h2>${formData.get('storyTitle')}</h2>
+                    <p>${formData.get('storyContent')}</p>
+                </div>
+                <div class="mission-section">
+                    <h2>${formData.get('missionTitle')}</h2>
+                    <p>${formData.get('missionContent')}</p>
+                </div>
+                <div class="values-section">
+                    <h2>${formData.get('valuesTitle')}</h2>
+                    <p>${formData.get('valuesContent')}</p>
+                </div>
+            `;
+            
+            previewContent.innerHTML = previewHTML;
+            previewSection.style.display = 'block';
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Auto-save functionality (optional)
+        let autoSaveTimeout;
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('input', function() {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    // Auto-save could be implemented here
+                    console.log('Auto-save triggered');
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

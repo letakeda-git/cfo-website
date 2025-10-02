@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Agatha Oeiras</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">Agatha Oeiras</a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/products" class="nav-link">Products</a></li>
+                <li><a href="/about" class="nav-link">About</a></li>
+                <li><a href="/contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-cart">
+                <a href="/cart" class="cart-link">
+                    <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h8.5M9.5 18a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8.5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                    </svg>
+                    <span class="cart-count" id="cart-count"><%= cartItemCount || 0 %></span>
+                </a>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="about-hero">
+            <div class="container">
+                <h1><%= aboutContent.heroTitle %></h1>
+                <p><%= aboutContent.heroSubtitle %></p>
+            </div>
+        </section>
+
+        <section class="about-content">
+            <div class="container">
+                <div class="about-story">
+                    <div class="about-text">
+                        <h2><%= aboutContent.philosophyTitle %></h2>
+                        <p><%= aboutContent.philosophyContent %></p>
+                        
+                        <p><%= aboutContent.philosophyContent2 %></p>
+                        
+                        <h3><%= aboutContent.processTitle %></h3>
+                        <p><%= aboutContent.processContent %></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="values">
+            <div class="container">
+                <h2><%= aboutContent.valuesTitle %></h2>
+                <div class="values-grid">
+                    <div class="value-item">
+                        <h3><%= aboutContent.qualityTitle %></h3>
+                        <p><%= aboutContent.qualityContent %></p>
+                    </div>
+                    <div class="value-item">
+                        <h3><%= aboutContent.sustainabilityTitle %></h3>
+                        <p><%= aboutContent.sustainabilityContent %></p>
+                    </div>
+                    <div class="value-item">
+                        <h3><%= aboutContent.authenticityTitle %></h3>
+                        <p><%= aboutContent.authenticityContent %></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Agatha Oeiras</h3>
+                    <p>Handcrafted ceramics for modern living</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>agatha.abdala@hotmail.com</p>
+                    <p>+351 967 799 032</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Agatha Oeiras. All rights reserved. | <a href="/admin/login" class="admin-footer-link">Admin</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>

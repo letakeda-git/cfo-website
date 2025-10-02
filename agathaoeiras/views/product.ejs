@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> - Agatha Oeiras</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">Agatha Oeiras</a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/products" class="nav-link">Products</a></li>
+                <li><a href="/about" class="nav-link">About</a></li>
+                <li><a href="/contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-cart">
+                <a href="/cart" class="cart-link">
+                    <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h8.5M9.5 18a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8.5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                    </svg>
+                    <span class="cart-count" id="cart-count"><%= cartItemCount || 0 %></span>
+                </a>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="product-detail">
+            <div class="container">
+                <div class="product-detail-content">
+                    <div class="product-images">
+                        <div class="main-image-container">
+                            <img id="mainImage" src="<%= product.image %>" alt="<%= product.name %>">
+                            <% if (product.images && product.images.length > 1) { %>
+                            <div class="image-navigation">
+                                <button class="nav-btn prev-btn" onclick="previousImage()" id="prevBtn">‹</button>
+                                <button class="nav-btn next-btn" onclick="nextImage()" id="nextBtn">›</button>
+                            </div>
+                            <div class="image-counter">
+                                <span id="currentImageNumber">1</span> / <span id="totalImages"><%= product.images.length %></span>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <h1><%= product.name %></h1>
+                        <p class="product-price">€<%= product.price %></p>
+                        <p class="product-description"><%= product.description %></p>
+                        
+                        <div class="product-actions">
+                            <button class="btn btn-primary btn-large add-to-cart-btn" data-product-id="<%= product.id %>" data-product-name="<%= product.name %>" data-product-price="<%= product.price %>">Add to Cart</button>
+                            <button class="btn btn-outline btn-large">Add to Wishlist</button>
+                        </div>
+                        
+                        <% if (product.productDetails) { %>
+                        <div class="product-info">
+                            <h3>Product Details</h3>
+                            <div class="product-details-content">
+                                <%= product.productDetails.replace(/\n/g, '<br>') %>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Agatha Oeiras</h3>
+                    <p>Handcrafted ceramics for modern living</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>agatha.abdala@hotmail.com</p>
+                    <p>+351 967 799 032</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Agatha Oeiras. All rights reserved. | <a href="/admin/login" class="admin-footer-link">Admin</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+    <script>
+        // Add to cart functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+            
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const productId = this.getAttribute('data-product-id');
+                    const productName = this.getAttribute('data-product-name');
+                    const productPrice = this.getAttribute('data-product-price');
+                    
+                    try {
+                        const response = await fetch('/cart/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                productId: parseInt(productId),
+                                quantity: 1
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            // Update cart count in navigation
+                            const cartCount = document.getElementById('cart-count');
+                            if (cartCount) {
+                                cartCount.textContent = result.cartItemCount;
+                            }
+                            
+                            // Show success message
+                            this.textContent = 'Added!';
+                            this.style.backgroundColor = '#28a745';
+                            
+                            setTimeout(() => {
+                                this.textContent = 'Add to Cart';
+                                this.style.backgroundColor = '';
+                            }, 2000);
+                        } else {
+                            alert('Error adding to cart: ' + (result.error || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Error adding to cart:', error);
+                        alert('Error adding to cart. Please try again.');
+                    }
+                });
+            });
+        });
+        
+        // Multiple images functionality - Define immediately
+        <% if (product.images && product.images.length > 1) { %>
+        const productImages = <%- JSON.stringify(product.images) %>;
+        let currentImageIndex = 0;
+        
+        // Define functions globally immediately
+        window.changeImage = function(index) {
+            console.log('changeImage called with index:', index, 'total images:', productImages.length);
+            if (index >= 0 && index < productImages.length) {
+                currentImageIndex = index;
+                const mainImage = document.getElementById('mainImage');
+                if (mainImage) {
+                    console.log('Changing image to:', productImages[index]);
+                    mainImage.src = productImages[index];
+                } else {
+                    console.log('Main image element not found');
+                }
+                
+                // Update image counter
+                const counter = document.getElementById('currentImageNumber');
+                if (counter) {
+                    counter.textContent = index + 1;
+                }
+            }
+        };
+        
+        window.nextImage = function() {
+            console.log('nextImage called, current index:', currentImageIndex);
+            const nextIndex = (currentImageIndex + 1) % productImages.length;
+            window.changeImage(nextIndex);
+        };
+        
+        window.previousImage = function() {
+            console.log('previousImage called, current index:', currentImageIndex);
+            const prevIndex = (currentImageIndex - 1 + productImages.length) % productImages.length;
+            window.changeImage(prevIndex);
+        };
+        
+        console.log('Functions defined and attached to window');
+        console.log('Product images:', productImages);
+        console.log('Window functions:', typeof window.nextImage, typeof window.previousImage);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (productImages.length > 1) {
+                if (e.key === 'ArrowRight') {
+                    window.nextImage();
+                } else if (e.key === 'ArrowLeft') {
+                    window.previousImage();
+                }
+            }
+        });
+        <% } else { %>
+        // No multiple images - define empty functions to prevent errors
+        window.changeImage = function() {};
+        window.nextImage = function() {};
+        window.previousImage = function() {};
+        <% } %>
+    </script>
+</body>
+</html>
