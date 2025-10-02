@@ -560,8 +560,8 @@ section {
 /* Contact */
 .contact-form-container {
     max-width: 600px;
-    margin: 0 auto;
-    text-align: center;
+    margin: 0;
+    text-align: left;
     padding-top: 0;
 }
 
@@ -1088,25 +1088,27 @@ section {
 /* Admin Footer Button Styling */
 .admin-footer-link {
     display: inline-block;
-    background: #007bff;
+    background: #6c757d;
     color: white;
     text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
     font-weight: 500;
     transition: all 0.3s ease;
     margin-left: 10px;
     border: none;
     cursor: pointer;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .admin-footer-link:hover {
-    background: #0056b3;
+    background: #5a6268;
     color: white;
     text-decoration: none;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
 }
 
 /* Product Details Styling */

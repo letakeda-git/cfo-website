@@ -91,34 +91,10 @@
         .btn-save:hover {
             background: #218838;
         }
-        .btn-preview {
-            background: #17a2b8;
-            color: white;
-            padding: 0.75rem 2rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            margin-left: 1rem;
-        }
-        .btn-preview:hover {
-            background: #138496;
-        }
         .form-actions {
             display: flex;
             gap: 1rem;
             margin-top: 2rem;
-        }
-        .preview-section {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 12px;
-            margin-top: 2rem;
-        }
-        .preview-section h3 {
-            margin-top: 0;
-            color: #333;
         }
         .success-message {
             background: #d4edda;
@@ -235,48 +211,12 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn-save">Save Changes</button>
-                <button type="button" class="btn-preview" onclick="previewAbout()">Preview</button>
             </div>
         </form>
 
-        <div class="preview-section" id="previewSection" style="display: none;">
-            <h3>Preview</h3>
-            <div id="previewContent"></div>
-        </div>
     </div>
 
     <script>
-        function previewAbout() {
-            const form = document.getElementById('editAboutForm');
-            const formData = new FormData(form);
-            
-            const previewContent = document.getElementById('previewContent');
-            const previewSection = document.getElementById('previewSection');
-            
-            // Build preview HTML
-            const previewHTML = `
-                <div class="hero-section">
-                    <h1>${formData.get('heroTitle')}</h1>
-                    <p>${formData.get('heroSubtitle')}</p>
-                </div>
-                <div class="story-section">
-                    <h2>${formData.get('storyTitle')}</h2>
-                    <p>${formData.get('storyContent')}</p>
-                </div>
-                <div class="mission-section">
-                    <h2>${formData.get('missionTitle')}</h2>
-                    <p>${formData.get('missionContent')}</p>
-                </div>
-                <div class="values-section">
-                    <h2>${formData.get('valuesTitle')}</h2>
-                    <p>${formData.get('valuesContent')}</p>
-                </div>
-            `;
-            
-            previewContent.innerHTML = previewHTML;
-            previewSection.style.display = 'block';
-            previewSection.scrollIntoView({ behavior: 'smooth' });
-        }
 
         // Auto-save functionality (optional)
         let autoSaveTimeout;
