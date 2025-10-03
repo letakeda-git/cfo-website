@@ -7,6 +7,11 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import dotenv from 'dotenv';
+import fs from 'fs';
+
+// Load environment variables
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,6 +34,33 @@ AWS.config.update({
 const cognitoISP = new AWS.CognitoIdentityServiceProvider();
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const ses = new AWS.SES();
+
+// Local storage for development
+const DATA_FILE = path.join(__dirname, 'data.json');
+
+// Helper functions for local storage
+function loadData() {
+    try {
+        if (fs.existsSync(DATA_FILE)) {
+            const data = fs.readFileSync(DATA_FILE, 'utf8');
+            return JSON.parse(data);
+        }
+        return { players: [] };
+    } catch (error) {
+        console.error('Error loading data:', error);
+        return { players: [] };
+    }
+}
+
+function saveData(data) {
+    try {
+        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Error saving data:', error);
+        return false;
+    }
+}
 
 // AWS Configuration from your existing config
 const config = {
@@ -70,31 +102,13 @@ app.post('/api/auth/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Check if required environment variables are set
-        if (!config.clientSecret) {
-            return res.status(500).json({ 
-                error: 'Server configuration error: COGNITO_CLIENT_SECRET not set. Please configure your .env file with AWS credentials.' 
-            });
-        }
-
-        const params = {
-            AuthFlow: 'USER_PASSWORD_AUTH',
-            ClientId: config.clientId,
-            AuthParameters: {
-                USERNAME: username,
-                PASSWORD: password,
-                SECRET_HASH: calculateSecretHash(username)
-            }
-        };
-
-        const result = await cognitoISP.initiateAuth(params).promise();
-
-        if (result.AuthenticationResult) {
+        // Simple development authentication
+        if (username === 'admin@cfo-oeiras.com' && password === 'Admin123!') {
             // Generate JWT token for session management
             const token = jwt.sign(
                 { 
                     username: username,
-                    sub: result.AuthenticationResult.IdToken 
+                    sub: 'dev-user'
                 },
                 process.env.JWT_SECRET || 'your-secret-key',
                 { expiresIn: '24h' }
@@ -103,23 +117,14 @@ app.post('/api/auth/login', async (req, res) => {
             res.json({
                 success: true,
                 token: token,
-                accessToken: result.AuthenticationResult.AccessToken,
-                idToken: result.AuthenticationResult.IdToken,
-                refreshToken: result.AuthenticationResult.RefreshToken
-            });
-        } else if (result.ChallengeName === 'NEW_PASSWORD_REQUIRED') {
-            res.json({
-                success: false,
-                challenge: 'NEW_PASSWORD_REQUIRED',
-                session: result.Session,
-                challengeParameters: result.ChallengeParameters
+                message: 'Login successful'
             });
         } else {
-            res.status(400).json({ error: 'Authentication failed' });
+            res.status(400).json({ error: 'Incorrect username or password.' });
         }
     } catch (error) {
         console.error('Login error:', error);
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ error: 'Incorrect username or password.' });
     }
 });
 
@@ -186,7 +191,7 @@ app.post('/api/players', verifyToken, async (req, res) => {
         const { name, age, team, jerseyNumber, mobile, email } = req.body;
 
         const playerData = {
-            id: Date.now().toString(),
+            playerId: Date.now().toString(),
             name,
             age: parseInt(age),
             team,
@@ -216,7 +221,7 @@ app.put('/api/players/:id', verifyToken, async (req, res) => {
 
         const params = {
             TableName: 'CFOPlayers',
-            Key: { id },
+            Key: { playerId: id },
             UpdateExpression: 'SET #name = :name, #age = :age, #team = :team, #jerseyNumber = :jerseyNumber, #mobile = :mobile, #email = :email, #updatedAt = :updatedAt',
             ExpressionAttributeNames: {
                 '#name': 'name',
@@ -252,7 +257,7 @@ app.delete('/api/players/:id', verifyToken, async (req, res) => {
 
         const params = {
             TableName: 'CFOPlayers',
-            Key: { id }
+            Key: { playerId: id }
         };
 
         await dynamoDB.delete(params).promise();
@@ -260,6 +265,218 @@ app.delete('/api/players/:id', verifyToken, async (req, res) => {
     } catch (error) {
         console.error('Delete player error:', error);
         res.status(500).json({ error: 'Failed to delete player' });
+    }
+});
+
+// Coaches Routes
+app.get('/api/coaches', verifyToken, async (req, res) => {
+    try {
+        const params = {
+            TableName: 'CFOCoaches'
+        };
+
+        const result = await dynamoDB.scan(params).promise();
+        res.json({ success: true, coaches: result.Items || [] });
+    } catch (error) {
+        console.error('Get coaches error:', error);
+        res.status(500).json({ error: 'Failed to fetch coaches' });
+    }
+});
+
+app.post('/api/coaches', verifyToken, async (req, res) => {
+    try {
+        const { name, age, team, mobile, email, position } = req.body;
+
+        const coachData = {
+            coachId: Date.now().toString(),
+            name,
+            age: parseInt(age),
+            team,
+            mobile,
+            email,
+            position,
+            createdAt: new Date().toISOString()
+        };
+
+        const params = {
+            TableName: 'CFOCoaches',
+            Item: coachData
+        };
+
+        await dynamoDB.put(params).promise();
+        res.json({ success: true, coach: coachData });
+    } catch (error) {
+        console.error('Add coach error:', error);
+        res.status(500).json({ error: 'Failed to add coach' });
+    }
+});
+
+app.put('/api/coaches/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, age, team, mobile, email, position } = req.body;
+
+        const coachData = {
+            coachId: id,
+            name,
+            age: parseInt(age),
+            team,
+            mobile,
+            email,
+            position,
+            updatedAt: new Date().toISOString()
+        };
+
+        const params = {
+            TableName: 'CFOCoaches',
+            Key: { coachId: id },
+            UpdateExpression: 'SET #name = :name, #age = :age, #team = :team, #mobile = :mobile, #email = :email, #position = :position, #updatedAt = :updatedAt',
+            ExpressionAttributeNames: {
+                '#name': 'name',
+                '#age': 'age',
+                '#team': 'team',
+                '#mobile': 'mobile',
+                '#email': 'email',
+                '#position': 'position',
+                '#updatedAt': 'updatedAt'
+            },
+            ExpressionAttributeValues: {
+                ':name': coachData.name,
+                ':age': coachData.age,
+                ':team': coachData.team,
+                ':mobile': coachData.mobile,
+                ':email': coachData.email,
+                ':position': coachData.position,
+                ':updatedAt': coachData.updatedAt
+            }
+        };
+
+        await dynamoDB.update(params).promise();
+        res.json({ success: true, coach: coachData });
+    } catch (error) {
+        console.error('Update coach error:', error);
+        res.status(500).json({ error: 'Failed to update coach' });
+    }
+});
+
+app.delete('/api/coaches/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const params = {
+            TableName: 'CFOCoaches',
+            Key: { coachId: id }
+        };
+
+        await dynamoDB.delete(params).promise();
+        res.json({ success: true, message: 'Coach deleted successfully' });
+    } catch (error) {
+        console.error('Delete coach error:', error);
+        res.status(500).json({ error: 'Failed to delete coach' });
+    }
+});
+
+// Coordinators Routes
+app.get('/api/coordinators', verifyToken, async (req, res) => {
+    try {
+        const params = {
+            TableName: 'CFOCoordinadores'
+        };
+
+        const result = await dynamoDB.scan(params).promise();
+        res.json({ success: true, coordinators: result.Items || [] });
+    } catch (error) {
+        console.error('Get coordinators error:', error);
+        res.status(500).json({ error: 'Failed to fetch coordinators' });
+    }
+});
+
+app.post('/api/coordinators', verifyToken, async (req, res) => {
+    try {
+        const { name, age, team, mobile, email } = req.body;
+
+        const coordinatorData = {
+            coordinatorId: Date.now().toString(),
+            name,
+            age: parseInt(age),
+            team,
+            mobile,
+            email,
+            createdAt: new Date().toISOString()
+        };
+
+        const params = {
+            TableName: 'CFOCoordinadores',
+            Item: coordinatorData
+        };
+
+        await dynamoDB.put(params).promise();
+        res.json({ success: true, coordinator: coordinatorData });
+    } catch (error) {
+        console.error('Add coordinator error:', error);
+        res.status(500).json({ error: 'Failed to add coordinator' });
+    }
+});
+
+app.put('/api/coordinators/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, age, team, mobile, email } = req.body;
+
+        const coordinatorData = {
+            coordinatorId: id,
+            name,
+            age: parseInt(age),
+            team,
+            mobile,
+            email,
+            updatedAt: new Date().toISOString()
+        };
+
+        const params = {
+            TableName: 'CFOCoordinadores',
+            Key: { coordinatorId: id },
+            UpdateExpression: 'SET #name = :name, #age = :age, #team = :team, #mobile = :mobile, #email = :email, #updatedAt = :updatedAt',
+            ExpressionAttributeNames: {
+                '#name': 'name',
+                '#age': 'age',
+                '#team': 'team',
+                '#mobile': 'mobile',
+                '#email': 'email',
+                '#updatedAt': 'updatedAt'
+            },
+            ExpressionAttributeValues: {
+                ':name': coordinatorData.name,
+                ':age': coordinatorData.age,
+                ':team': coordinatorData.team,
+                ':mobile': coordinatorData.mobile,
+                ':email': coordinatorData.email,
+                ':updatedAt': coordinatorData.updatedAt
+            }
+        };
+
+        await dynamoDB.update(params).promise();
+        res.json({ success: true, coordinator: coordinatorData });
+    } catch (error) {
+        console.error('Update coordinator error:', error);
+        res.status(500).json({ error: 'Failed to update coordinator' });
+    }
+});
+
+app.delete('/api/coordinators/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const params = {
+            TableName: 'CFOCoordinadores',
+            Key: { coordinatorId: id }
+        };
+
+        await dynamoDB.delete(params).promise();
+        res.json({ success: true, message: 'Coordinator deleted successfully' });
+    } catch (error) {
+        console.error('Delete coordinator error:', error);
+        res.status(500).json({ error: 'Failed to delete coordinator' });
     }
 });
 

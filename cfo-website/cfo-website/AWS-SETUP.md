@@ -153,7 +153,7 @@ localStorage.setItem('debug', 'true');
 ```
 cfo-website/
 ├── login.html          # Login page with AWS integration
-├── admin.html          # Admin dashboard (protected)
+├── players.html        # Players dashboard (protected)
 ├── auth-service.js     # AWS authentication service
 ├── aws-config.js      # AWS configuration (create this)
 ├── aws-config.example.js # Configuration template

@@ -1,4 +1,5 @@
 // API Client for communicating with the Node.js backend
+if (typeof APIClient === 'undefined') {
 class APIClient {
     constructor() {
         this.baseURL = window.location.origin;
@@ -96,6 +97,56 @@ class APIClient {
         });
     }
 
+    // Coach management methods
+    async getCoaches() {
+        return await this.request('/api/coaches');
+    }
+
+    async addCoach(coachData) {
+        return await this.request('/api/coaches', {
+            method: 'POST',
+            body: JSON.stringify(coachData)
+        });
+    }
+
+    async updateCoach(coachId, coachData) {
+        return await this.request(`/api/coaches/${coachId}`, {
+            method: 'PUT',
+            body: JSON.stringify(coachData)
+        });
+    }
+
+    async deleteCoach(coachId) {
+        return await this.request(`/api/coaches/${coachId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // Coordinator management methods
+    async getCoordinators() {
+        return await this.request('/api/coordinators');
+    }
+
+    async addCoordinator(coordinatorData) {
+        return await this.request('/api/coordinators', {
+            method: 'POST',
+            body: JSON.stringify(coordinatorData)
+        });
+    }
+
+    async updateCoordinator(coordinatorId, coordinatorData) {
+        return await this.request(`/api/coordinators/${coordinatorId}`, {
+            method: 'PUT',
+            body: JSON.stringify(coordinatorData)
+        });
+    }
+
+    async deleteCoordinator(coordinatorId) {
+        return await this.request(`/api/coordinators/${coordinatorId}`, {
+            method: 'DELETE'
+        });
+    }
+
     // Email methods
     async sendEmail(email, subject, message) {
         return await this.request('/api/send-email', {
@@ -106,4 +157,7 @@ class APIClient {
 }
 
 // Create global API client instance
-window.apiClient = new APIClient();
+if (typeof window.apiClient === 'undefined') {
+    window.apiClient = new APIClient();
+}
+}

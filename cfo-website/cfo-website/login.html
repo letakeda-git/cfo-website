@@ -111,7 +111,7 @@
           
           // Redirect to admin dashboard after successful login
           setTimeout(() => {
-            window.location.href = './admin.html';
+            window.location.href = './players.html';
           }, 1500);
         } else {
           // Check if it's a new password challenge
@@ -224,7 +224,7 @@
           
           // Redirect to admin dashboard
           setTimeout(() => {
-            window.location.href = './admin.html';
+            window.location.href = './players.html';
           }, 1500);
         } else {
           showNewPasswordError(result.error || 'Erro ao definir palavra-passe. Tente novamente.');
@@ -283,7 +283,7 @@
       if (window.apiClient && window.apiClient.token) {
         showSuccess('Já está autenticado. A redirecionar...');
         setTimeout(() => {
-          window.location.href = './admin.html';
+          window.location.href = './players.html';
         }, 1000);
       }
     }

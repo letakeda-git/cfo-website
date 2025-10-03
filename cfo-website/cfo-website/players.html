@@ -31,59 +31,76 @@
     </header>
 
     <main>
-      <section class="hero">
-        <div class="container">
-          <h1>Painel de Administração</h1>
-          <p class="section-sub">Bem-vindo à área administrativa do CFO.</p>
-        </div>
-      </section>
 
-      <section class="features">
-        <div class="container">
-          <h2>Funcionalidades</h2>
-          <div class="cards">
-            <div class="card">
-              <h3>Gestão de Jogadores</h3>
-              <p>Gerir informações dos jogadores, estatísticas e histórico.</p>
-            </div>
-            <div class="card">
-              <h3>Calendário de Jogos</h3>
-              <p>Agendar e gerir jogos, treinos e eventos.</p>
-            </div>
-            <div class="card">
-              <h3>Relatórios</h3>
-              <p>Visualizar relatórios de performance e estatísticas.</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section class="data-table">
         <div class="container">
           <div class="table-header">
-            <h2>Dados da Equipa</h2>
+          <div class="section-tabs">
+            <button class="tab-button active" onclick="switchTab('atletas')">Atletas</button>
+            <button class="tab-button" onclick="switchTab('treinadores')">Treinadores</button>
+            <button class="tab-button" onclick="switchTab('coordenadores')">Coordenadores</button>
+          </div>
             <div class="table-actions">
               <button onclick="loadPlayers()" class="btn btn-outline" id="refresh-btn">
                 <span id="refresh-text">Atualizar</span>
                 <span id="refresh-loading" style="display: none;">A carregar...</span>
               </button>
-              <a href="./add-player.html" class="btn">+ Adicionar Jogador</a>
+              <button class="btn" onclick="openAddPlayerModal()">+ Adicionar Jogador</button>
             </div>
           </div>
+          <!-- Filtros -->
+          <div class="filters-section">
+            <div class="filters-row">
+              <div class="filter-group">
+                <label for="name-filter">Nome:</label>
+                <input type="text" id="name-filter" placeholder="Filtrar por nome..." />
+              </div>
+            <div class="filter-group">
+                <label for="team-filter">Equipa:</label>
+              <select id="team-filter">
+                <option value="">Todas as equipas</option>
+                <option value="Seniores">Seniores</option>
+                <option value="Juniores">Juniores</option>
+                <option value="Juvenis">Juvenis</option>
+                <option value="Iniciados">Iniciados</option>
+                <option value="Infantis">Infantis</option>
+                <option value="Benjamins Sub-11">Benjamins Sub-11</option>
+                <option value="Benjamins Sub-10">Benjamins Sub-10</option>
+                <option value="Traquinas">Traquinas</option>
+                <option value="Petizes">Petizes</option>
+              </select>
+            </div>
+            <div class="filter-group">
+                <label for="position-filter">Posição:</label>
+                <select id="position-filter">
+                  <option value="">Todas as posições</option>
+                  <option value="Guarda-Redes">Guarda-Redes</option>
+                  <option value="Fixo">Fixo</option>
+                  <option value="Alas">Alas</option>
+                  <option value="Pivô">Pivô</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <button id="clear-filters" class="btn btn-outline">Limpar Filtros</button>
+              </div>
+              </div>
+              </div>
+          
           <div class="table-container">
             <table class="admin-table" id="players-table">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Idade</th>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Idade</th>
                   <th>Equipa</th>
-                  <th>Número Camisola</th>
-                  <th>Telemóvel</th>
-                  <th>Email</th>
-                  <th>Data de Registo</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
+            <th>Número Camisola</th>
+            <th>Telemóvel</th>
+            <th>Email</th>
+            <th>Data de Registo</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
               <tbody id="players-tbody">
                 <tr id="loading-row">
                   <td colspan="8" style="text-align: center; padding: 20px;">
@@ -157,6 +174,72 @@
       </div>
     </div>
 
+    <!-- Add Player Modal -->
+    <div id="add-player-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Adicionar Novo Jogador</h3>
+          <button onclick="closeAddPlayerModal()" class="modal-close">&times;</button>
+        </div>
+        <form id="add-player-form" onsubmit="handleAddPlayer(event)">
+          <label>
+            Nome:
+            <input type="text" name="name" required>
+          </label>
+          
+          <label>
+            Idade:
+            <input type="number" name="age" min="1" max="100" required>
+          </label>
+          
+          <label>
+            Posição:
+            <select name="position" required>
+              <option value="">Selecione a posição</option>
+              <option value="Guarda-Redes">Guarda-Redes</option>
+              <option value="Fixo">Fixo</option>
+              <option value="Alas">Alas</option>
+              <option value="Pivô">Pivô</option>
+            </select>
+          </label>
+          
+          <label>
+            Equipa:
+            <select name="team" required>
+              <option value="">Selecione a equipa</option>
+              <option value="Seniores">Seniores</option>
+              <option value="Juniores">Juniores</option>
+              <option value="Juvenis">Juvenis</option>
+              <option value="Iniciados">Iniciados</option>
+              <option value="Infantis">Infantis</option>
+              <option value="Benjamins Sub-11">Benjamins Sub-11</option>
+              <option value="Benjamins Sub-10">Benjamins Sub-10</option>
+              <option value="Traquinas">Traquinas</option>
+              <option value="Petizes">Petizes</option>
+            </select>
+          </label>
+          
+          <label>
+            Telemóvel:
+            <input type="tel" name="mobile">
+          </label>
+          
+          <label>
+            Email:
+            <input type="email" name="email">
+          </label>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn" id="add-player-submit-btn">
+              <span id="add-btn-text">Adicionar Jogador</span>
+              <span id="add-btn-loading" style="display: none;">A adicionar...</span>
+            </button>
+            <button type="button" onclick="closeAddPlayerModal()" class="btn btn-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Email Modal -->
     <div id="email-modal" class="modal" style="display: none;">
       <div class="modal-content">
@@ -224,11 +307,142 @@
       }
 
       // Display user information
-      const userInfo = { email: 'Admin' }; // Simplified for now
+      const token = window.apiClient.token;
+      let userInfo = { email: 'Admin' }; // Default fallback
+      
+      if (token) {
+        try {
+          // Decode JWT token to get user info
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          userInfo = {
+            email: payload.username || payload.email || 'Admin',
+            name: payload.name || payload.username || 'Admin'
+          };
+        } catch (error) {
+          console.error('Error decoding token:', error);
+        }
+      }
+      
       const userInfoEl = document.getElementById('user-info');
       if (userInfo && userInfoEl) {
-        userInfoEl.textContent = `Olá, ${userInfo.email}`;
+        const displayName = userInfo.name || userInfo.email;
+        userInfoEl.textContent = `Olá, ${displayName}`;
       }
+    }
+
+    async function switchTab(tabName) {
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Add active class to clicked tab
+      event.target.classList.add('active');
+      
+      // Handle different tabs
+      switch(tabName) {
+        case 'atletas':
+          // Show players table
+          document.getElementById('players-table').style.display = 'block';
+          loadPlayers();
+          break;
+        case 'treinadores':
+          // Redirect to coaches page
+          window.location.href = './coaches.html';
+          break;
+        case 'coordenadores':
+          // Redirect to coordinators page
+          window.location.href = './coordenadores.html';
+          break;
+      }
+    }
+
+    async function loadCoaches() {
+      try {
+        const result = await window.apiClient.getCoaches();
+        if (result.success) {
+          displayCoaches(result.coaches);
+        } else {
+          console.error('Error loading coaches:', result.error);
+        }
+      } catch (error) {
+        console.error('Error loading coaches:', error);
+      }
+    }
+
+    async function loadCoordinators() {
+      try {
+        const result = await window.apiClient.getCoordinators();
+        if (result.success) {
+          displayCoordinators(result.coordinators);
+        } else {
+          console.error('Error loading coordinators:', result.error);
+        }
+      } catch (error) {
+        console.error('Error loading coordinators:', error);
+      }
+    }
+
+    function displayCoaches(coaches) {
+      const tableBody = document.querySelector('#players-table tbody');
+      if (!tableBody) return;
+
+      tableBody.innerHTML = '';
+      
+      if (coaches.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--muted);">Nenhum treinador encontrado</td></tr>';
+        return;
+      }
+
+      coaches.forEach(coach => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${coach.name || '-'}</td>
+          <td>${coach.age || '-'}</td>
+          <td>${coach.team || '-'}</td>
+          <td>${coach.position || '-'}</td>
+          <td>${coach.mobile || '-'}</td>
+          <td>${coach.email || '-'}</td>
+          <td>
+            <div class="action-buttons">
+              <button onclick="editCoach('${coach.coachId}')" class="btn btn-outline btn-small">Editar</button>
+              <button onclick="deleteCoach('${coach.coachId}')" class="btn btn-danger btn-small">Remover</button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function displayCoordinators(coordinators) {
+      const tableBody = document.querySelector('#players-table tbody');
+      if (!tableBody) return;
+
+      tableBody.innerHTML = '';
+      
+      if (coordinators.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--muted);">Nenhum coordenador encontrado</td></tr>';
+        return;
+      }
+
+      coordinators.forEach(coordinator => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${coordinator.name || '-'}</td>
+          <td>${coordinator.age || '-'}</td>
+          <td>${coordinator.team || '-'}</td>
+          <td>${coordinator.position || '-'}</td>
+          <td>${coordinator.mobile || '-'}</td>
+          <td>${coordinator.email || '-'}</td>
+          <td>
+            <div class="action-buttons">
+              <button onclick="editCoordinator('${coordinator.coordinatorId}')" class="btn btn-outline btn-small">Editar</button>
+              <button onclick="deleteCoordinator('${coordinator.coordinatorId}')" class="btn btn-danger btn-small">Remover</button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
     }
 
     async function loadPlayers() {
@@ -247,6 +461,7 @@
         const result = await window.apiClient.getPlayers();
         
         if (result.success) {
+          allPlayers = result.players; // Armazenar todos os jogadores
           displayPlayers(result.players);
         } else {
           showError('Erro ao carregar jogadores: ' + result.error);
@@ -262,6 +477,39 @@
           if (refreshLoading) refreshLoading.style.display = 'none';
         }
       }
+    }
+
+    // Variável global para armazenar todos os jogadores
+    let allPlayers = [];
+
+    // Função para filtrar jogadores
+    function filterPlayers() {
+      const nameFilter = document.getElementById('name-filter').value.toLowerCase();
+      const teamFilter = document.getElementById('team-filter').value;
+      const positionFilter = document.getElementById('position-filter').value;
+      
+      let filteredPlayers = allPlayers.filter(player => {
+        // Filtro por nome
+        const nameMatch = !nameFilter || player.name.toLowerCase().includes(nameFilter);
+        
+        // Filtro por equipa
+        const teamMatch = !teamFilter || player.team === teamFilter;
+        
+        // Filtro por posição
+        const positionMatch = !positionFilter || player.position === positionFilter;
+        
+        return nameMatch && teamMatch && positionMatch;
+      });
+      
+      displayPlayers(filteredPlayers);
+    }
+
+    // Função para limpar filtros
+    function clearFilters() {
+      document.getElementById('name-filter').value = '';
+      document.getElementById('team-filter').value = '';
+      document.getElementById('position-filter').value = '';
+      displayPlayers(allPlayers);
     }
 
     function displayPlayers(players) {
@@ -280,7 +528,7 @@
         tbody.innerHTML = `
           <tr>
             <td colspan="8" style="text-align: center; padding: 20px; color: var(--muted);">
-              Nenhum jogador encontrado. <a href="./add-player.html" style="color: var(--brand);">Adicionar primeiro jogador</a>
+                Nenhum jogador encontrado. <button onclick="openAddPlayerModal()" style="color: var(--brand); background: none; border: none; text-decoration: underline; cursor: pointer;">Adicionar primeiro jogador</button>
             </td>
           </tr>
         `;
@@ -416,10 +664,65 @@
       hideEditMessages();
     }
 
+    function openAddPlayerModal() {
+      document.getElementById('add-player-modal').style.display = 'block';
+    }
+
+    function closeAddPlayerModal() {
+      document.getElementById('add-player-modal').style.display = 'none';
+      document.getElementById('add-player-form').reset();
+    }
+
     function closeEditModal() {
       document.getElementById('edit-modal').style.display = 'none';
       currentEditingPlayerId = null;
       hideEditMessages();
+    }
+
+    async function handleAddPlayer(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const formData = new FormData(form);
+      
+      const playerData = {
+        name: formData.get('name'),
+        age: parseInt(formData.get('age')),
+        position: formData.get('position'),
+        team: formData.get('team'),
+        mobile: formData.get('mobile') || '',
+        email: formData.get('email') || ''
+      };
+
+      const submitBtn = document.getElementById('add-player-submit-btn');
+      const btnText = document.getElementById('add-btn-text');
+      const btnLoading = document.getElementById('add-btn-loading');
+
+      // Show loading state
+      submitBtn.disabled = true;
+      btnText.style.display = 'none';
+      btnLoading.style.display = 'inline';
+
+      try {
+        const result = await window.apiClient.addPlayer(playerData);
+        
+        if (result.success) {
+          // Success - close modal and refresh list
+          closeAddPlayerModal();
+          loadPlayers();
+          showSuccessMessage('Jogador adicionado com sucesso!');
+        } else {
+          showErrorMessage('Erro ao adicionar jogador: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error adding player:', error);
+        showErrorMessage('Erro ao adicionar jogador. Por favor, tente novamente.');
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+      }
     }
 
     async function handleEditPlayer(event) {
@@ -644,6 +947,38 @@
 
       checkAuth();
       loadPlayers();
+      
+        // Event listeners para filtros
+        const nameFilter = document.getElementById('name-filter');
+        const teamFilter = document.getElementById('team-filter');
+        const positionFilter = document.getElementById('position-filter');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        
+        if (nameFilter) {
+          nameFilter.addEventListener('input', filterPlayers);
+        }
+        
+        if (teamFilter) {
+          teamFilter.addEventListener('change', filterPlayers);
+        }
+        
+        if (positionFilter) {
+          positionFilter.addEventListener('change', filterPlayers);
+        }
+        
+        if (clearFiltersBtn) {
+          clearFiltersBtn.addEventListener('click', clearFilters);
+        }
+
+        // Close modal when clicking outside
+        const addPlayerModal = document.getElementById('add-player-modal');
+        if (addPlayerModal) {
+          addPlayerModal.addEventListener('click', function(event) {
+            if (event.target === addPlayerModal) {
+              closeAddPlayerModal();
+            }
+          });
+        }
     });
     </script>
   </body>

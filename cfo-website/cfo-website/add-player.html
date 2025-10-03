@@ -19,7 +19,7 @@
   <body>
     <header class="site-header">
       <div class="container">
-        <a href="./admin.html" class="logo">
+        <a href="./players.html" class="logo">
           <img src="./public/logo-cfo.png" alt="Logótipo do CF Oeiras" />
           <span>Clube Futsal de Oeiras</span>
         </a>
@@ -90,7 +90,7 @@
                 <span id="btn-text">Adicionar Jogador</span>
                 <span id="btn-loading" style="display: none;">A adicionar...</span>
               </button>
-              <a href="./admin.html" class="btn btn-outline">Cancelar</a>
+              <a href="./players.html" class="btn btn-outline">Cancelar</a>
             </div>
           </form>
         </div>
@@ -118,10 +118,26 @@
       }
 
       // Display user information
-      const userInfo = { email: 'Admin' }; // Simplified for now
+      const token = window.apiClient.token;
+      let userInfo = { email: 'Admin' }; // Default fallback
+      
+      if (token) {
+        try {
+          // Decode JWT token to get user info
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          userInfo = {
+            email: payload.username || payload.email || 'Admin',
+            name: payload.name || payload.username || 'Admin'
+          };
+        } catch (error) {
+          console.error('Error decoding token:', error);
+        }
+      }
+      
       const userInfoEl = document.getElementById('user-info');
       if (userInfo && userInfoEl) {
-        userInfoEl.textContent = `Olá, ${userInfo.email}`;
+        const displayName = userInfo.name || userInfo.email;
+        userInfoEl.textContent = `Olá, ${displayName}`;
       }
     }
 
@@ -166,7 +182,7 @@
           
           // Redirect to admin page after 2 seconds
           setTimeout(() => {
-            window.location.href = './admin.html';
+            window.location.href = './players.html';
           }, 2000);
         } else {
           showError(result.error || 'Erro ao adicionar jogador. Tente novamente.');

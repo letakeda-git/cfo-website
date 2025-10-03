@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Treinadores • CFO</title>
+    <meta name="description" content="Gestão de treinadores do Clube Futsal de Oeiras." />
+    <link rel="icon" type="image/x-icon" href="./favicon_io/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon_io/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon_io/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon_io/favicon-16x16.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <!-- API Client -->
+    <script src="./api-client.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a href="./index.html" class="logo">
+          <img src="./public/logo-cfo.png" alt="Logótipo do CF Oeiras" />
+          <span>Clube Futsal de Oeiras</span>
+        </a>
+        <div>
+          <span id="user-info" class="user-info"></span>
+          <button onclick="logout()" class="btn btn-outline btn-small">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="data-table">
+        <div class="container">
+          <div class="table-header">
+            <div class="section-tabs">
+              <button class="tab-button" onclick="switchTab('atletas')">Atletas</button>
+              <button class="tab-button active" onclick="switchTab('treinadores')">Treinadores</button>
+              <button class="tab-button" onclick="switchTab('coordenadores')">Coordenadores</button>
+            </div>
+            <div class="table-actions">
+              <button onclick="loadCoaches()" class="btn btn-outline" id="refresh-btn">
+                <span id="refresh-text">Atualizar</span>
+                <span id="refresh-loading" style="display: none;">A carregar...</span>
+              </button>
+              <button class="btn" onclick="openAddCoachModal()">+ Adicionar Treinador</button>
+            </div>
+          </div>
+          
+          <!-- Filtros -->
+          <div class="filters-section">
+            <div class="filters-row">
+              <div class="filter-group">
+                <label for="name-filter">Nome:</label>
+                <input type="text" id="name-filter" placeholder="Filtrar por nome..." />
+              </div>
+              <div class="filter-group">
+                <label for="team-filter">Equipa:</label>
+                <select id="team-filter">
+                  <option value="">Todas as equipas</option>
+                  <option value="Seniores">Seniores</option>
+                  <option value="Juniores">Juniores</option>
+                  <option value="Juvenis">Juvenis</option>
+                  <option value="Iniciados">Iniciados</option>
+                  <option value="Infantis">Infantis</option>
+                  <option value="Benjamins Sub-11">Benjamins Sub-11</option>
+                  <option value="Benjamins Sub-10">Benjamins Sub-10</option>
+                  <option value="Traquinas">Traquinas</option>
+                  <option value="Petizes">Petizes</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <button id="clear-filters" class="btn btn-outline">Limpar Filtros</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="admin-table" id="coaches-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Idade</th>
+                  <th>Equipa</th>
+                  <th>Telemóvel</th>
+                  <th>Email</th>
+                  <th>Data de Registo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="coaches-tbody">
+                <tr id="loading-row">
+                  <td colspan="7" style="text-align: center; padding: 20px;">
+                    <span id="loading-text">A carregar treinadores...</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Add Coach Modal -->
+    <div id="addCoachModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Adicionar Novo Treinador</h3>
+          <button onclick="closeAddCoachModal()" class="modal-close">&times;</button>
+        </div>
+        <form id="addCoachForm" onsubmit="return handleAddCoach(event)">
+          <div id="add-error-message" class="error-message" style="display: none;"></div>
+          <div id="add-success-message" class="success-message" style="display: none;"></div>
+          
+          <label>
+            <span>Nome Completo</span>
+            <input type="text" name="name" id="add-name" placeholder="Nome completo do treinador" required />
+          </label>
+          
+          <label>
+            <span>Idade</span>
+            <input type="number" name="age" id="add-age" placeholder="Idade do treinador" min="18" max="99" required />
+          </label>
+          
+          <label>
+            <span>Equipa</span>
+            <select name="team" id="add-team" required>
+              <option value="">Selecionar equipa</option>
+              <option value="Seniores">Seniores</option>
+              <option value="Juniores">Juniores</option>
+              <option value="Juvenis">Juvenis</option>
+              <option value="Iniciados">Iniciados</option>
+              <option value="Infantis">Infantis</option>
+              <option value="Benjamins Sub-11">Benjamins Sub-11</option>
+              <option value="Benjamins Sub-10">Benjamins Sub-10</option>
+              <option value="Traquinas">Traquinas</option>
+              <option value="Petizes">Petizes</option>
+            </select>
+          </label>
+          
+          
+          <label>
+            <span>Número de Telemóvel</span>
+            <input type="tel" name="mobile" id="add-mobile" placeholder="912 345 678" pattern="[0-9]{9}" required />
+          </label>
+          
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" id="add-email" placeholder="treinador@exemplo.com" />
+          </label>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn" id="add-submit-btn">
+              <span id="add-btn-text">Adicionar Treinador</span>
+              <span id="add-btn-loading" style="display: none;">A adicionar...</span>
+            </button>
+            <button type="button" onclick="closeAddCoachModal()" class="btn btn-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Coach Modal -->
+    <div id="editCoachModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Editar Treinador</h3>
+          <button onclick="closeEditCoachModal()" class="modal-close">&times;</button>
+        </div>
+        <form id="editCoachForm" onsubmit="return handleEditCoach(event)">
+          <div id="edit-error-message" class="error-message" style="display: none;"></div>
+          <div id="edit-success-message" class="success-message" style="display: none;"></div>
+          
+          <label>
+            <span>Nome Completo</span>
+            <input type="text" name="name" id="edit-name" placeholder="Nome completo do treinador" required />
+          </label>
+          
+          <label>
+            <span>Idade</span>
+            <input type="number" name="age" id="edit-age" placeholder="Idade do treinador" min="18" max="99" required />
+          </label>
+          
+          <label>
+            <span>Equipa</span>
+            <select name="team" id="edit-team" required>
+              <option value="">Selecionar equipa</option>
+              <option value="Seniores">Seniores</option>
+              <option value="Juniores">Juniores</option>
+              <option value="Juvenis">Juvenis</option>
+              <option value="Iniciados">Iniciados</option>
+              <option value="Infantis">Infantis</option>
+              <option value="Benjamins Sub-11">Benjamins Sub-11</option>
+              <option value="Benjamins Sub-10">Benjamins Sub-10</option>
+              <option value="Traquinas">Traquinas</option>
+              <option value="Petizes">Petizes</option>
+            </select>
+          </label>
+          
+          
+          <label>
+            <span>Número de Telemóvel</span>
+            <input type="tel" name="mobile" id="edit-mobile" placeholder="912 345 678" pattern="[0-9]{9}" required />
+          </label>
+          
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" id="edit-email" placeholder="treinador@exemplo.com" />
+          </label>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn" id="edit-submit-btn">
+              <span id="edit-btn-text">Atualizar Treinador</span>
+              <span id="edit-btn-loading" style="display: none;">A atualizar...</span>
+            </button>
+            <button type="button" onclick="closeEditCoachModal()" class="btn btn-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> CFO. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script>
+      function logout() {
+        if (window.apiClient) {
+          window.apiClient.clearToken();
+        }
+        window.location.href = './login.html';
+      }
+
+      function checkAuth() {
+        if (!window.apiClient || !window.apiClient.token) {
+          window.location.href = './login.html';
+          return;
+        }
+
+        // Display user information
+        const token = window.apiClient.token;
+        let userInfo = { email: 'Admin' }; // Default fallback
+        
+        if (token) {
+          try {
+            // Decode JWT token to get user info
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            userInfo = {
+              email: payload.username || payload.email || 'Admin',
+              name: payload.name || payload.username || 'Admin'
+            };
+          } catch (error) {
+            console.error('Error decoding token:', error);
+          }
+        }
+        
+        const userInfoEl = document.getElementById('user-info');
+        if (userInfo && userInfoEl) {
+          const displayName = userInfo.name || userInfo.email;
+          userInfoEl.textContent = `Olá, ${displayName}`;
+        }
+      }
+
+      async function switchTab(tabName) {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked tab
+        event.target.classList.add('active');
+        
+        // Handle different tabs
+        switch(tabName) {
+          case 'atletas':
+            // Redirect to players page
+            window.location.href = './players.html';
+            break;
+          case 'treinadores':
+            // Show coaches table
+            document.getElementById('coaches-table').style.display = 'block';
+            loadCoaches();
+            break;
+          case 'coordenadores':
+            // Redirect to coordinators page
+            window.location.href = './coordenadores.html';
+            break;
+        }
+      }
+
+      // Global variables
+      let allCoaches = [];
+      let currentEditingCoachId = null;
+      let currentCoachesList = [];
+
+      async function loadCoaches() {
+        const refreshBtn = document.getElementById('refresh-btn');
+        const refreshText = document.getElementById('refresh-text');
+        const refreshLoading = document.getElementById('refresh-loading');
+        
+        // Show loading state
+        if (refreshBtn) {
+          refreshBtn.disabled = true;
+          if (refreshText) refreshText.style.display = 'none';
+          if (refreshLoading) refreshLoading.style.display = 'inline';
+        }
+        
+        try {
+          const result = await window.apiClient.getCoaches();
+          
+          if (result.success) {
+            allCoaches = result.coaches; // Store all coaches
+            displayCoaches(result.coaches);
+          } else {
+            showError('Erro ao carregar treinadores: ' + result.error);
+          }
+        } catch (error) {
+          console.error('Error loading coaches:', error);
+          showError('Erro de conexão ao carregar treinadores.');
+        } finally {
+          // Hide loading state
+          if (refreshBtn) {
+            refreshBtn.disabled = false;
+            if (refreshText) refreshText.style.display = 'inline';
+            if (refreshLoading) refreshLoading.style.display = 'none';
+          }
+        }
+      }
+
+      // Filter coaches
+      function filterCoaches() {
+        const nameFilter = document.getElementById('name-filter').value.toLowerCase();
+        const teamFilter = document.getElementById('team-filter').value;
+        
+        let filteredCoaches = allCoaches.filter(coach => {
+          // Filter by name
+          const nameMatch = !nameFilter || coach.name.toLowerCase().includes(nameFilter);
+          
+          // Filter by team
+          const teamMatch = !teamFilter || coach.team === teamFilter;
+          
+          return nameMatch && teamMatch;
+        });
+        
+        displayCoaches(filteredCoaches);
+      }
+
+      // Clear filters
+      function clearFilters() {
+        document.getElementById('name-filter').value = '';
+        document.getElementById('team-filter').value = '';
+        displayCoaches(allCoaches);
+      }
+
+      function displayCoaches(coaches) {
+        const tbody = document.getElementById('coaches-tbody');
+        const loadingRow = document.getElementById('loading-row');
+        
+        // Store the coaches list globally for edit functionality
+        currentCoachesList = coaches;
+        
+        // Remove loading row
+        if (loadingRow) {
+          loadingRow.remove();
+        }
+        
+        if (coaches.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 20px; color: var(--muted);">
+                Nenhum treinador encontrado. <button onclick="openAddCoachModal()" style="color: var(--brand); background: none; border: none; text-decoration: underline; cursor: pointer;">Adicionar primeiro treinador</button>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        
+        // Display coaches
+        tbody.innerHTML = coaches.map(coach => `
+          <tr>
+            <td>${coach.name}</td>
+            <td>${coach.age} anos</td>
+            <td>${coach.escalao || coach.team || '-'}</td>
+            <td>${coach.phone || coach.mobile || '-'}</td>
+            <td>${coach.email || '-'}</td>
+            <td>${formatDate(coach.createdAt)}</td>
+            <td>
+              <div class="action-buttons">
+                <button onclick="editCoach('${coach.coachId}')" class="btn btn-outline btn-small">
+                  Editar
+                </button>
+                <button onclick="deleteCoach('${coach.coachId}', '${coach.name}')" class="btn btn-danger btn-small">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      function formatDate(dateString) {
+        try {
+          const date = new Date(dateString);
+          return date.toLocaleDateString('pt-PT', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          });
+        } catch (error) {
+          return dateString;
+        }
+      }
+
+      function showError(message) {
+        const tbody = document.getElementById('coaches-tbody');
+        const loadingRow = document.getElementById('loading-row');
+        
+        if (loadingRow) {
+          loadingRow.remove();
+        }
+        
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 20px; color: var(--brand);">
+              ${message}
+            </td>
+          </tr>
+        `;
+      }
+
+      async function deleteCoach(coachId, coachName) {
+        // Show confirmation dialog
+        const confirmed = confirm(`Tem a certeza que deseja eliminar o treinador "${coachName}"?\n\nEsta ação não pode ser desfeita.`);
+        
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          const result = await window.apiClient.deleteCoach(coachId);
+          
+          if (result.success) {
+            // Show success message temporarily
+            showSuccess(result.message);
+            
+            // Reload the coaches list after a short delay
+            setTimeout(() => {
+              loadCoaches();
+            }, 1500);
+          } else {
+            showError('Erro ao eliminar treinador: ' + result.error);
+          }
+        } catch (error) {
+          console.error('Error deleting coach:', error);
+          showError('Erro de conexão ao eliminar treinador.');
+        }
+      }
+
+      function showSuccess(message) {
+        const tbody = document.getElementById('coaches-tbody');
+        const loadingRow = document.getElementById('loading-row');
+        
+        if (loadingRow) {
+          loadingRow.remove();
+        }
+        
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 20px; color: var(--success); background: rgba(34, 197, 94, 0.1);">
+              ${message}
+            </td>
+          </tr>
+        `;
+      }
+
+      // Add Coach Modal functions
+      function openAddCoachModal() {
+        document.getElementById('addCoachModal').style.display = 'flex';
+        hideAddMessages();
+      }
+
+      function closeAddCoachModal() {
+        document.getElementById('addCoachModal').style.display = 'none';
+        document.getElementById('addCoachForm').reset();
+        hideAddMessages();
+      }
+
+      async function handleAddCoach(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const name = form.name.value.trim();
+        const age = form.age.value.trim();
+        const team = form.team.value.trim();
+        const mobile = form.mobile.value.trim();
+        const email = form.email.value.trim();
+
+        if (!name || !age || !team || !mobile) {
+          showAddError('Por favor, preencha todos os campos obrigatórios.');
+          return false;
+        }
+
+        setAddLoadingState(true);
+        hideAddMessages();
+
+        try {
+          const coachData = {
+            name: name,
+            age: age,
+            team: team,
+            mobile: mobile,
+            email: email || null
+          };
+
+          const result = await window.apiClient.addCoach(coachData);
+
+          if (result.success) {
+            showAddSuccess('Treinador adicionado com sucesso!');
+            closeAddCoachModal();
+            // Reload the coaches list
+            setTimeout(() => {
+              loadCoaches();
+            }, 1500);
+          } else {
+            showAddError(result.error || 'Erro ao adicionar treinador. Tente novamente.');
+          }
+
+        } catch (error) {
+          console.error('Error adding coach:', error);
+          showAddError('Erro de conexão. Tente novamente.');
+        } finally {
+          setAddLoadingState(false);
+        }
+
+        return false;
+      }
+
+      function setAddLoadingState(loading) {
+        const btn = document.getElementById('add-submit-btn');
+        const btnText = document.getElementById('add-btn-text');
+        const btnLoading = document.getElementById('add-btn-loading');
+
+        if (loading) {
+          btn.disabled = true;
+          btnText.style.display = 'none';
+          btnLoading.style.display = 'inline';
+        } else {
+          btn.disabled = false;
+          btnText.style.display = 'inline';
+          btnLoading.style.display = 'none';
+        }
+      }
+
+      function showAddError(message) {
+        const errorDiv = document.getElementById('add-error-message');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+
+        const successDiv = document.getElementById('add-success-message');
+        successDiv.style.display = 'none';
+      }
+
+      function showAddSuccess(message) {
+        const successDiv = document.getElementById('add-success-message');
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+
+        const errorDiv = document.getElementById('add-error-message');
+        errorDiv.style.display = 'none';
+      }
+
+      function hideAddMessages() {
+        document.getElementById('add-error-message').style.display = 'none';
+        document.getElementById('add-success-message').style.display = 'none';
+      }
+
+      // Edit Coach Modal functions
+      function editCoach(coachId) {
+        // Find the coach data from the current coaches list
+        const coach = currentCoachesList.find(c => c.coachId === coachId);
+        
+        if (!coach) {
+          showError('Treinador não encontrado.');
+          return;
+        }
+
+        currentEditingCoachId = coachId;
+
+        // Populate the form with coach data
+        document.getElementById('edit-name').value = coach.name || '';
+        document.getElementById('edit-age').value = coach.age || '';
+        document.getElementById('edit-team').value = coach.team || '';
+        document.getElementById('edit-mobile').value = coach.phone || coach.mobile || '';
+        document.getElementById('edit-email').value = coach.email || '';
+
+        // Show the modal
+        document.getElementById('editCoachModal').style.display = 'flex';
+        hideEditMessages();
+      }
+
+      function closeEditCoachModal() {
+        document.getElementById('editCoachModal').style.display = 'none';
+        currentEditingCoachId = null;
+        hideEditMessages();
+      }
+
+      async function handleEditCoach(event) {
+        event.preventDefault();
+
+        if (!currentEditingCoachId) {
+          showEditError('ID do treinador não encontrado.');
+          return false;
+        }
+
+        const form = event.target;
+        const name = form.name.value.trim();
+        const age = form.age.value.trim();
+        const team = form.team.value.trim();
+        const mobile = form.mobile.value.trim();
+        const email = form.email.value.trim();
+
+        if (!name || !age || !team || !mobile) {
+          showEditError('Por favor, preencha todos os campos obrigatórios.');
+          return false;
+        }
+
+        setEditLoadingState(true);
+        hideEditMessages();
+
+        try {
+          const coachData = {
+            name: name,
+            age: age,
+            team: team,
+            mobile: mobile,
+            email: email || null
+          };
+
+          const result = await window.apiClient.updateCoach(currentEditingCoachId, coachData);
+
+          if (result.success) {
+            showEditSuccess('Treinador atualizado com sucesso!');
+            closeEditCoachModal();
+            // Reload the coaches list
+            setTimeout(() => {
+              loadCoaches();
+            }, 1500);
+          } else {
+            showEditError(result.error || 'Erro ao atualizar treinador. Tente novamente.');
+          }
+
+        } catch (error) {
+          console.error('Error updating coach:', error);
+          showEditError('Erro de conexão. Tente novamente.');
+        } finally {
+          setEditLoadingState(false);
+        }
+
+        return false;
+      }
+
+      function setEditLoadingState(loading) {
+        const btn = document.getElementById('edit-submit-btn');
+        const btnText = document.getElementById('edit-btn-text');
+        const btnLoading = document.getElementById('edit-btn-loading');
+
+        if (loading) {
+          btn.disabled = true;
+          btnText.style.display = 'none';
+          btnLoading.style.display = 'inline';
+        } else {
+          btn.disabled = false;
+          btnText.style.display = 'inline';
+          btnLoading.style.display = 'none';
+        }
+      }
+
+      function showEditError(message) {
+        const errorDiv = document.getElementById('edit-error-message');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+
+        const successDiv = document.getElementById('edit-success-message');
+        successDiv.style.display = 'none';
+      }
+
+      function showEditSuccess(message) {
+        const successDiv = document.getElementById('edit-success-message');
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+
+        const errorDiv = document.getElementById('edit-error-message');
+        errorDiv.style.display = 'none';
+      }
+
+      function hideEditMessages() {
+        document.getElementById('edit-error-message').style.display = 'none';
+        document.getElementById('edit-success-message').style.display = 'none';
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const yearEl = document.getElementById('year');
+        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+        checkAuth();
+        loadCoaches();
+        
+        // Event listeners para filtros
+        const nameFilter = document.getElementById('name-filter');
+        const teamFilter = document.getElementById('team-filter');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        
+        if (nameFilter) {
+          nameFilter.addEventListener('input', filterCoaches);
+        }
+        
+        if (teamFilter) {
+          teamFilter.addEventListener('change', filterCoaches);
+        }
+        
+        if (clearFiltersBtn) {
+          clearFiltersBtn.addEventListener('click', clearFilters);
+        }
+      });
+    </script>
+  </body>
+</html>
