@@ -62,7 +62,7 @@
                         </div>
                         <div class="product-info-admin">
                             <h3><%= product.name %></h3>
-                            <p><strong>€<%= product.price %></strong> • <%= product.category %></p>
+                            <p><strong>€<%= product.price %></strong> <%= product.category %></p>
                             <p><%= product.description %></p>
                             <div class="product-actions">
                                 <a href="/admin/products/<%= product.id %>/edit" class="btn-edit">Edit</a>

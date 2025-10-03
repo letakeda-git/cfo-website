@@ -128,7 +128,7 @@ window.editProduct = function(productId) {
         if (editBtn && editBtn.getAttribute('href') && editBtn.getAttribute('href').includes(productId)) {
             const name = card.querySelector('h3').textContent;
             const price = card.querySelector('p strong').textContent.replace('€', '');
-            const category = card.querySelector('p').textContent.split('•')[1].trim();
+                   const category = card.querySelector('p').textContent.split('€')[1].trim();
             const description = card.querySelectorAll('p')[1].textContent;
             const image = card.querySelector('img').src;
             
