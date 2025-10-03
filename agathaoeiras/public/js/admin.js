@@ -60,8 +60,8 @@ function handleCloseModal() {
     }
 }
 
-// Delete product function
-function deleteProduct(productId) {
+// Delete product function - Make globally accessible
+window.deleteProduct = function(productId) {
     fetch(`/admin/products/${productId}`, {
         method: 'DELETE',
         headers: {
@@ -80,13 +80,123 @@ function deleteProduct(productId) {
         console.error('Error:', error);
         alert('Error deleting product');
     });
-}
+};
 
-// Close modal function
-function closeModal() {
+// Close modal function - Make globally accessible
+window.closeModal = function() {
     const modal = document.getElementById('editModal');
     if (modal) {
         modal.classList.add('hidden');
+    }
+};
+
+// Dashboard specific functionality
+let currentProductId = null;
+
+function toggleEditImageInput() {
+    const imageType = document.getElementById('editImageType');
+    const uploadGroup = document.getElementById('editImageUploadGroup');
+    const urlGroup = document.getElementById('editImageUrlGroup');
+    
+    if (imageType && uploadGroup && urlGroup) {
+        if (imageType.value === 'upload') {
+            uploadGroup.classList.remove('hidden');
+            urlGroup.classList.add('hidden');
+            const fileInput = document.getElementById('editImageFile');
+            const urlInput = document.getElementById('editImageUrl');
+            if (fileInput) fileInput.required = true;
+            if (urlInput) urlInput.required = false;
+        } else {
+            uploadGroup.classList.add('hidden');
+            urlGroup.classList.remove('hidden');
+            const fileInput = document.getElementById('editImageFile');
+            const urlInput = document.getElementById('editImageUrl');
+            if (fileInput) fileInput.required = false;
+            if (urlInput) urlInput.required = true;
+        }
+    }
+}
+
+// Edit Product - Make globally accessible
+window.editProduct = function(productId) {
+    // Find product data from the page
+    const productCards = document.querySelectorAll('.product-card-admin');
+    let productData = null;
+    
+    productCards.forEach(card => {
+        const editBtn = card.querySelector('.btn-edit');
+        if (editBtn && editBtn.getAttribute('href') && editBtn.getAttribute('href').includes(productId)) {
+            const name = card.querySelector('h3').textContent;
+            const price = card.querySelector('p strong').textContent.replace('€', '');
+            const category = card.querySelector('p').textContent.split('•')[1].trim();
+            const description = card.querySelectorAll('p')[1].textContent;
+            const image = card.querySelector('img').src;
+            
+            productData = { name, price, category, description, image };
+        }
+    });
+    
+    if (productData) {
+        currentProductId = productId;
+        const nameInput = document.getElementById('editName');
+        const priceInput = document.getElementById('editPrice');
+        const categoryInput = document.getElementById('editCategory');
+        const urlInput = document.getElementById('editImageUrl');
+        const descriptionInput = document.getElementById('editDescription');
+        const imageTypeSelect = document.getElementById('editImageType');
+        const modal = document.getElementById('editModal');
+        
+        if (nameInput) nameInput.value = productData.name;
+        if (priceInput) priceInput.value = productData.price;
+        if (categoryInput) categoryInput.value = productData.category;
+        if (urlInput) urlInput.value = productData.image;
+        if (descriptionInput) descriptionInput.value = productData.description;
+        
+        // Set to URL mode and show current image
+        if (imageTypeSelect) {
+            imageTypeSelect.value = 'url';
+            toggleEditImageInput();
+        }
+        
+        if (modal) modal.classList.remove('hidden');
+    }
+};
+
+// Update Product Form
+function initializeEditForm() {
+    const editForm = document.getElementById('editProductForm');
+    if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch(`/admin/products/${currentProductId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error updating product');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error updating product');
+            }
+        });
+    }
+}
+
+// Close modal when clicking outside
+function initializeModalClickOutside() {
+    window.onclick = function(event) {
+        const modal = document.getElementById('editModal');
+        if (event.target === modal) {
+            closeModal();
+        }
     }
 }
 
@@ -107,6 +217,16 @@ document.addEventListener('DOMContentLoaded', function() {
         imageFiles.addEventListener('change', function() {
             previewImages(this);
         });
+    }
+    
+    // Initialize dashboard specific functionality
+    initializeEditForm();
+    initializeModalClickOutside();
+    
+    // Initialize image type toggle
+    const imageTypeSelect = document.getElementById('editImageType');
+    if (imageTypeSelect) {
+        imageTypeSelect.addEventListener('change', toggleEditImageInput);
     }
 });
 
