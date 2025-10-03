@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Agatha Oeiras</title>
+    <title>Início - Agatha Oeiras</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,10 +13,10 @@
         <div class="nav-container">
             <a href="/" class="nav-logo">Agatha Oeiras</a>
             <ul class="nav-menu">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/products" class="nav-link">Products</a></li>
-                <li><a href="/about" class="nav-link">About</a></li>
-                <li><a href="/contact" class="nav-link">Contact</a></li>
+                <li><a href="/" class="nav-link">Início</a></li>
+                <li><a href="/products" class="nav-link">Produtos</a></li>
+                <li><a href="/about" class="nav-link">Sobre</a></li>
+                <li><a href="/contact" class="nav-link">Contacto</a></li>
             </ul>
             <div class="nav-cart">
                 <a href="/cart" class="cart-link">
@@ -37,10 +37,10 @@
     <main>
         <section class="hero">
             <div class="hero-content">
-                <h1>Handcrafted Ceramics</h1>
-                <p>Minimalist design meets functional beauty. Each piece is carefully crafted to bring simplicity and elegance to your home.</p>
-                <a href="/products" class="btn btn-primary">Shop Collection</a>
-                <a href="/contact" class="btn btn-outline">Contact Us</a>
+                <h1>Cerâmica Artesanal</h1>
+                <p>Design minimalista encontra beleza funcional. Cada peça é cuidadosamente criada para trazer simplicidade e elegância à sua casa.</p>
+                <a href="/products" class="btn btn-primary">Ver Coleção</a>
+                <a href="/contact" class="btn btn-outline">Contacte-nos</a>
             </div>
         </section>
 
@@ -55,7 +55,7 @@
                         <div class="product-info">
                             <h3><%= product.name %></h3>
                             <p class="product-price">€<%= product.price %></p>
-                            <a href="/product/<%= product.id %>" class="btn btn-secondary">View Details</a>
+                            <a href="/product/<%= product.id %>" class="btn btn-secondary">Ver Detalhes</a>
                         </div>
                     </div>
                     <% }); %>
@@ -70,25 +70,25 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Agatha Oeiras</h3>
-                    <p>Handcrafted ceramics for modern living</p>
+                    <p>Cerâmica artesanal para vida moderna</p>
                 </div>
                 <div class="footer-section">
-                    <h4>Quick Links</h4>
+                    <h4>Links Rápidos</h4>
                     <ul>
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/products">Products</a></li>
-                        <li><a href="/about">About</a></li>
-                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/">Início</a></li>
+                        <li><a href="/products">Produtos</a></li>
+                        <li><a href="/about">Sobre</a></li>
+                        <li><a href="/contact">Contacto</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Contact</h4>
+                    <h4>Contacto</h4>
                     <p>agatha.abdala@hotmail.com</p>
                     <p>+351 967 799 032</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Agatha Oeiras. All rights reserved. | <a href="/admin/login" class="admin-footer-link">Admin</a></p>
+                <p>&copy; 2024 Agatha Oeiras. Todos os direitos reservados. | <a href="/admin/login" class="admin-footer-link">Admin</a></p>
             </div>
         </div>
     </footer>
