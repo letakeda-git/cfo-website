@@ -559,26 +559,34 @@ app.post('/admin/products', requireAuth, upload.array('imageFiles', 10), async (
     
     let imageUrls = [];
     
-           // Temporarily use local storage only for testing
-           console.log('Using local storage for image uploads...');
-           const fs = require('fs');
-           const path = require('path');
-           
-           // Ensure uploads directory exists
-           const uploadsDir = path.join(__dirname, 'public', 'uploads');
-           if (!fs.existsSync(uploadsDir)) {
-             fs.mkdirSync(uploadsDir, { recursive: true });
-           }
-           
-           // Save files locally
-           imageUrls = [];
-           for (const file of req.files) {
-             const fileName = `imageFile-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
-             const filePath = path.join(uploadsDir, fileName);
-             
-             fs.writeFileSync(filePath, file.buffer);
-             imageUrls.push(`/uploads/${fileName}`);
-           }
+    // Upload images to S3
+    try {
+      console.log('Uploading images to S3...');
+      imageUrls = await uploadMultipleToS3(req.files, 'products');
+      console.log('Images uploaded to S3:', imageUrls);
+    } catch (s3Error) {
+      console.error('S3 upload failed, using local storage fallback:', s3Error);
+      
+      // Fallback to local storage if S3 fails
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Ensure uploads directory exists
+      const uploadsDir = path.join(__dirname, 'public', 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      // Save files locally as fallback
+      imageUrls = [];
+      for (const file of req.files) {
+        const fileName = `imageFile-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
+        const filePath = path.join(uploadsDir, fileName);
+        
+        fs.writeFileSync(filePath, file.buffer);
+        imageUrls.push(`/uploads/${fileName}`);
+      }
+    }
     
     const mainImage = imageUrls[0]; // First image is the main image
     
@@ -645,29 +653,40 @@ app.post('/admin/products/:id', requireAuth, upload.array('imageFiles', 10), asy
     
            // Handle image updates
            if (req.files && req.files.length > 0) {
-             // Use local storage for image uploads
-             console.log('Using local storage for image uploads...');
-             const fs = require('fs');
-             const path = require('path');
-             
-             // Ensure uploads directory exists
-             const uploadsDir = path.join(__dirname, 'public', 'uploads');
-             if (!fs.existsSync(uploadsDir)) {
-               fs.mkdirSync(uploadsDir, { recursive: true });
-             }
-             
-             // Save files locally
-             const imageUrls = [];
-             for (const file of req.files) {
-               const fileName = `imageFile-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
-               const filePath = path.join(uploadsDir, fileName);
+             // Upload new images to S3
+             try {
+               console.log('Uploading new images to S3...');
+               const imageUrls = await uploadMultipleToS3(req.files, 'products');
+               console.log('New images uploaded to S3:', imageUrls);
                
-               fs.writeFileSync(filePath, file.buffer);
-               imageUrls.push(`/uploads/${fileName}`);
+               imagePath = imageUrls[0]; // First image is the main image
+               images = imageUrls;
+             } catch (s3Error) {
+               console.error('S3 upload failed, using local storage fallback:', s3Error);
+               
+               // Fallback to local storage if S3 fails
+               const fs = require('fs');
+               const path = require('path');
+               
+               // Ensure uploads directory exists
+               const uploadsDir = path.join(__dirname, 'public', 'uploads');
+               if (!fs.existsSync(uploadsDir)) {
+                 fs.mkdirSync(uploadsDir, { recursive: true });
+               }
+               
+               // Save files locally as fallback
+               const imageUrls = [];
+               for (const file of req.files) {
+                 const fileName = `imageFile-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
+                 const filePath = path.join(uploadsDir, fileName);
+                 
+                 fs.writeFileSync(filePath, file.buffer);
+                 imageUrls.push(`/uploads/${fileName}`);
+               }
+               
+               imagePath = imageUrls[0]; // First image is the main image
+               images = imageUrls;
              }
-             
-             imagePath = imageUrls[0]; // First image is the main image
-             images = imageUrls;
            } else {
       // Keep existing images if no new images provided
       try {
