@@ -7,7 +7,7 @@ function previewImages(input) {
     previewGrid.innerHTML = '';
     
     if (input.files && input.files.length > 0) {
-        imagesPreview.style.display = 'block';
+        imagesPreview.classList.remove('hidden');
         
         Array.from(input.files).forEach((file, index) => {
             const reader = new FileReader();
@@ -23,7 +23,7 @@ function previewImages(input) {
             reader.readAsDataURL(file);
         });
     } else {
-        imagesPreview.style.display = 'none';
+        imagesPreview.classList.add('hidden');
     }
 }
 
@@ -86,7 +86,7 @@ function deleteProduct(productId) {
 function closeModal() {
     const modal = document.getElementById('editModal');
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.add('hidden');
     }
 }
 

@@ -1226,3 +1226,16 @@ section {
     font-weight: 500;
     margin-left: 0.5rem;
 }
+
+/* Utility classes for CSP compliance */
+.inline-form {
+    display: inline;
+}
+
+.icon-margin {
+    margin-right: 8px;
+}
+
+.hidden {
+    display: none;
+}

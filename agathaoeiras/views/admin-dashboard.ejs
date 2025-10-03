@@ -285,7 +285,7 @@
             <div class="admin-actions">
                 <span class="admin-user">Welcome, <%= username || 'Admin' %></span>
                 <a href="/" class="btn-admin-secondary">View Store</a>
-                <form method="POST" action="/admin/logout" style="display: inline;">
+                <form method="POST" action="/admin/logout" class="inline-form">
                     <button type="submit" class="btn-admin-secondary">Logout</button>
                 </form>
             </div>
@@ -301,14 +301,14 @@
             <div class="admin-section-content">
                 <div class="quick-actions">
                     <a href="/admin/products/add" class="btn btn-primary btn-large">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-margin">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
                         Add New Product
                     </a>
                     <a href="/admin/about/edit" class="btn btn-outline btn-large">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-margin">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
@@ -388,7 +388,7 @@
                     <input type="file" id="editImageFile" name="imageFile" accept="image/*">
                     <small class="form-help">Supported formats: JPG, PNG, GIF, WebP (Max 5MB)</small>
                 </div>
-                <div class="form-group" id="editImageUrlGroup" style="display: none;">
+                <div class="form-group" id="editImageUrlGroup" class="hidden">
                     <label for="editImageUrl">Image URL</label>
                     <input type="url" id="editImageUrl" name="imageUrl">
                 </div>

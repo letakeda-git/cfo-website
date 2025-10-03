@@ -233,7 +233,7 @@
                     <label for="imageFiles">Upload Images (Multiple)</label>
                     <input type="file" id="imageFiles" name="imageFiles" accept="image/*" multiple onchange="previewImages(this)">
                     <div class="form-help">Supported formats: JPG, PNG, GIF, WebP (Max 5MB each). You can select multiple files. The first image will be the main product image.</div>
-                    <div class="images-preview" id="imagesPreview" style="display: none;">
+                    <div class="images-preview" id="imagesPreview" class="hidden">
                         <div class="preview-grid" id="previewGrid"></div>
                     </div>
                     <% if (product.image) { %>
