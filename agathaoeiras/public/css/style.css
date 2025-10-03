@@ -1768,6 +1768,7 @@ section {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
 }
 
 .admin-title {
@@ -1777,7 +1778,7 @@ section {
 
 .admin-actions {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: center;
 }
 
