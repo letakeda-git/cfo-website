@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard • CFO</title>
+    <meta name="description" content="Painel de administração do Clube Futsal de Oeiras." />
+    <link rel="icon" type="image/x-icon" href="./favicon_io/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon_io/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon_io/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon_io/favicon-16x16.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <!-- API Client -->
+    <script src="./api-client.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a href="./index.html" class="logo">
+          <img src="./public/logo-cfo.png" alt="Logótipo do CF Oeiras" />
+          <span>Clube Futsal de Oeiras</span>
+        </a>
+        <div>
+          <span id="user-info" class="user-info"></span>
+          <button onclick="logout()" class="btn btn-outline btn-small">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <h1>Painel de Administração</h1>
+          <p class="section-sub">Bem-vindo à área administrativa do CFO.</p>
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="container">
+          <h2>Funcionalidades</h2>
+          <div class="cards">
+            <div class="card">
+              <h3>Gestão de Jogadores</h3>
+              <p>Gerir informações dos jogadores, estatísticas e histórico.</p>
+            </div>
+            <div class="card">
+              <h3>Calendário de Jogos</h3>
+              <p>Agendar e gerir jogos, treinos e eventos.</p>
+            </div>
+            <div class="card">
+              <h3>Relatórios</h3>
+              <p>Visualizar relatórios de performance e estatísticas.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="data-table">
+        <div class="container">
+          <div class="table-header">
+            <h2>Dados da Equipa</h2>
+            <div class="table-actions">
+              <button onclick="loadPlayers()" class="btn btn-outline" id="refresh-btn">
+                <span id="refresh-text">Atualizar</span>
+                <span id="refresh-loading" style="display: none;">A carregar...</span>
+              </button>
+              <a href="./add-player.html" class="btn">+ Adicionar Jogador</a>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="admin-table" id="players-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Idade</th>
+                  <th>Equipa</th>
+                  <th>Número Camisola</th>
+                  <th>Telemóvel</th>
+                  <th>Email</th>
+                  <th>Data de Registo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="players-tbody">
+                <tr id="loading-row">
+                  <td colspan="8" style="text-align: center; padding: 20px;">
+                    <span id="loading-text">A carregar jogadores...</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Edit Player Modal -->
+    <div id="edit-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Editar Jogador</h3>
+          <button onclick="closeEditModal()" class="modal-close">&times;</button>
+        </div>
+        <form id="edit-player-form" onsubmit="return handleEditPlayer(event)">
+          <div id="edit-error-message" class="error-message" style="display: none;"></div>
+          <div id="edit-success-message" class="success-message" style="display: none;"></div>
+          
+          <label>
+            <span>Nome Completo</span>
+            <input type="text" name="name" id="edit-name" placeholder="Nome completo do jogador" required />
+          </label>
+          
+          <label>
+            <span>Idade</span>
+            <input type="number" name="age" id="edit-age" placeholder="Idade do jogador" min="5" max="99" required />
+          </label>
+          
+          <label>
+            <span>Equipa</span>
+            <select name="team" id="edit-team" required>
+              <option value="">Selecionar equipa</option>
+              <option value="Benjamins">Benjamins</option>
+              <option value="Infantis">Infantis</option>
+              <option value="Iniciados">Iniciados</option>
+              <option value="Juvenis">Juvenis</option>
+              <option value="Juniores">Juniores</option>
+              <option value="Seniores">Seniores</option>
+            </select>
+          </label>
+          
+          <label>
+            <span>Número da Camisola</span>
+            <input type="number" name="jerseyNumber" id="edit-jerseyNumber" placeholder="Ex: 10" min="1" max="99" />
+          </label>
+          
+          <label>
+            <span>Número de Telemóvel</span>
+            <input type="tel" name="mobile" id="edit-mobile" placeholder="912 345 678" pattern="[0-9]{9}" required />
+          </label>
+          
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" id="edit-email" placeholder="jogador@exemplo.com" />
+          </label>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn" id="edit-submit-btn">
+              <span id="edit-btn-text">Atualizar Jogador</span>
+              <span id="edit-btn-loading" style="display: none;">A atualizar...</span>
+            </button>
+            <button type="button" onclick="closeEditModal()" class="btn btn-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div id="email-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Enviar Email</h3>
+          <button onclick="closeEmailModal()" class="modal-close">&times;</button>
+        </div>
+        <form id="email-form" onsubmit="return handleSendEmail(event)">
+          <div id="email-error-message" class="error-message" style="display: none;"></div>
+          <div id="email-success-message" class="success-message" style="display: none;"></div>
+          
+          <div class="email-info">
+            <p><strong>Para:</strong> <span id="email-player-name"></span></p>
+            <p><strong>Email:</strong> <span id="email-address"></span></p>
+          </div>
+          
+          <label>
+            <span>Assunto</span>
+            <input type="text" name="subject" id="email-subject" placeholder="Assunto do email..." required />
+          </label>
+          
+          <label>
+            <span>Mensagem</span>
+            <textarea name="message" id="email-message" placeholder="Digite a sua mensagem aqui..." rows="6" required></textarea>
+          </label>
+          
+          <div class="quick-messages">
+            <label>Mensagens Rápidas:</label>
+            <div class="quick-buttons">
+              <button type="button" onclick="setQuickEmail('Lembrete de Treino', 'Treino hoje às 19h. Não faltes!')" class="btn btn-outline btn-small">Lembrete de Treino</button>
+              <button type="button" onclick="setQuickEmail('Lembrete de Jogo', 'Jogo amanhã às 15h. Boa sorte!')" class="btn btn-outline btn-small">Lembrete de Jogo</button>
+              <button type="button" onclick="setQuickEmail('Reunião de Equipa', 'Reunião de equipa na próxima segunda.')" class="btn btn-outline btn-small">Reunião</button>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn" id="email-submit-btn">
+              <span id="email-btn-text">Enviar Email</span>
+              <span id="email-btn-loading" style="display: none;">A enviar...</span>
+            </button>
+            <button type="button" onclick="closeEmailModal()" class="btn btn-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> CFO. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script>
+    function logout() {
+      if (window.apiClient) {
+        window.apiClient.clearToken();
+      }
+      window.location.href = './login.html';
+    }
+
+    function checkAuth() {
+      if (!window.apiClient || !window.apiClient.token) {
+        window.location.href = './login.html';
+        return;
+      }
+
+      // Display user information
+      const userInfo = { email: 'Admin' }; // Simplified for now
+      const userInfoEl = document.getElementById('user-info');
+      if (userInfo && userInfoEl) {
+        userInfoEl.textContent = `Olá, ${userInfo.email}`;
+      }
+    }
+
+    async function loadPlayers() {
+      const refreshBtn = document.getElementById('refresh-btn');
+      const refreshText = document.getElementById('refresh-text');
+      const refreshLoading = document.getElementById('refresh-loading');
+      
+      // Show loading state
+      if (refreshBtn) {
+        refreshBtn.disabled = true;
+        if (refreshText) refreshText.style.display = 'none';
+        if (refreshLoading) refreshLoading.style.display = 'inline';
+      }
+      
+      try {
+        const result = await window.apiClient.getPlayers();
+        
+        if (result.success) {
+          displayPlayers(result.players);
+        } else {
+          showError('Erro ao carregar jogadores: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error loading players:', error);
+        showError('Erro de conexão ao carregar jogadores.');
+      } finally {
+        // Hide loading state
+        if (refreshBtn) {
+          refreshBtn.disabled = false;
+          if (refreshText) refreshText.style.display = 'inline';
+          if (refreshLoading) refreshLoading.style.display = 'none';
+        }
+      }
+    }
+
+    function displayPlayers(players) {
+      const tbody = document.getElementById('players-tbody');
+      const loadingRow = document.getElementById('loading-row');
+      
+      // Store the players list globally for edit functionality
+      currentPlayersList = players;
+      
+      // Remove loading row
+      if (loadingRow) {
+        loadingRow.remove();
+      }
+      
+      if (players.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 20px; color: var(--muted);">
+              Nenhum jogador encontrado. <a href="./add-player.html" style="color: var(--brand);">Adicionar primeiro jogador</a>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      // Display players
+      tbody.innerHTML = players.map(player => `
+        <tr>
+          <td>${player.name}</td>
+          <td>${player.age} anos</td>
+          <td>${player.team}</td>
+          <td>${player.jerseyNumber || '-'}</td>
+          <td>${player.mobile}</td>
+          <td>${player.email || '-'}</td>
+          <td>${formatDate(player.createdAt)}</td>
+          <td>
+            <div class="action-buttons">
+              <button onclick="editPlayer('${player.playerId}')" class="btn btn-outline btn-small">
+                Editar
+              </button>
+              <button onclick="sendEmail('${player.playerId}', '${player.name}', '${player.email || 'email@example.com'}')" class="btn btn-email btn-small">
+                Email
+              </button>
+              <button onclick="deletePlayer('${player.playerId}', '${player.name}')" class="btn btn-danger btn-small">
+                Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function formatDate(dateString) {
+      try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-PT', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+      } catch (error) {
+        return dateString;
+      }
+    }
+
+    function showError(message) {
+      const tbody = document.getElementById('players-tbody');
+      const loadingRow = document.getElementById('loading-row');
+      
+      if (loadingRow) {
+        loadingRow.remove();
+      }
+      
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 20px; color: var(--brand);">
+            ${message}
+          </td>
+        </tr>
+      `;
+    }
+
+    async function deletePlayer(playerId, playerName) {
+      // Show confirmation dialog
+      const confirmed = confirm(`Tem a certeza que deseja eliminar o jogador "${playerName}"?\n\nEsta ação não pode ser desfeita.`);
+      
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        const result = await window.apiClient.deletePlayer(playerId);
+        
+        if (result.success) {
+          // Show success message temporarily
+          showSuccess(result.message);
+          
+          // Reload the players list after a short delay
+          setTimeout(() => {
+            loadPlayers();
+          }, 1500);
+        } else {
+          showError('Erro ao eliminar jogador: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error deleting player:', error);
+        showError('Erro de conexão ao eliminar jogador.');
+      }
+    }
+
+    function showSuccess(message) {
+      const tbody = document.getElementById('players-tbody');
+      const loadingRow = document.getElementById('loading-row');
+      
+      if (loadingRow) {
+        loadingRow.remove();
+      }
+      
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 20px; color: var(--success); background: rgba(34, 197, 94, 0.1);">
+            ${message}
+          </td>
+        </tr>
+      `;
+    }
+
+    let currentEditingPlayerId = null;
+    let currentPlayersList = []; // Store the current players list
+
+    function editPlayer(playerId) {
+      // Find the player data from the current players list
+      const player = currentPlayersList.find(p => p.playerId === playerId);
+      
+      if (!player) {
+        showError('Jogador não encontrado.');
+        return;
+      }
+
+      currentEditingPlayerId = playerId;
+
+      // Populate the form with player data
+      document.getElementById('edit-name').value = player.name || '';
+      document.getElementById('edit-age').value = player.age || '';
+      document.getElementById('edit-team').value = player.team || '';
+      document.getElementById('edit-jerseyNumber').value = player.jerseyNumber || '';
+      document.getElementById('edit-mobile').value = player.mobile || '';
+      document.getElementById('edit-email').value = player.email || '';
+
+      // Show the modal
+      document.getElementById('edit-modal').style.display = 'flex';
+      hideEditMessages();
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').style.display = 'none';
+      currentEditingPlayerId = null;
+      hideEditMessages();
+    }
+
+    async function handleEditPlayer(event) {
+      event.preventDefault();
+
+      if (!currentEditingPlayerId) {
+        showEditError('ID do jogador não encontrado.');
+        return false;
+      }
+
+      const form = event.target;
+      const name = form.name.value.trim();
+      const age = form.age.value.trim();
+      const team = form.team.value.trim();
+      const jerseyNumber = form.jerseyNumber.value.trim();
+      const mobile = form.mobile.value.trim();
+      const email = form.email.value.trim();
+
+      if (!name || !age || !team || !mobile) {
+        showEditError('Por favor, preencha todos os campos obrigatórios.');
+        return false;
+      }
+
+      setEditLoadingState(true);
+      hideEditMessages();
+
+      try {
+        const playerData = {
+          name: name,
+          age: age,
+          team: team,
+          jerseyNumber: jerseyNumber || null,
+          mobile: mobile,
+          email: email || null
+        };
+
+        const result = await window.apiClient.updatePlayer(currentEditingPlayerId, playerData);
+
+        if (result.success) {
+          showEditSuccess(result.message);
+          closeEditModal();
+          // Reload the players list
+          setTimeout(() => {
+            loadPlayers();
+          }, 1500);
+        } else {
+          showEditError(result.error || 'Erro ao atualizar jogador. Tente novamente.');
+        }
+
+      } catch (error) {
+        console.error('Error updating player:', error);
+        showEditError('Erro de conexão. Tente novamente.');
+      } finally {
+        setEditLoadingState(false);
+      }
+
+      return false;
+    }
+
+    function setEditLoadingState(loading) {
+      const btn = document.getElementById('edit-submit-btn');
+      const btnText = document.getElementById('edit-btn-text');
+      const btnLoading = document.getElementById('edit-btn-loading');
+
+      if (loading) {
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline';
+      } else {
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+      }
+    }
+
+    function showEditError(message) {
+      const errorDiv = document.getElementById('edit-error-message');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+
+      const successDiv = document.getElementById('edit-success-message');
+      successDiv.style.display = 'none';
+    }
+
+    function showEditSuccess(message) {
+      const successDiv = document.getElementById('edit-success-message');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+
+      const errorDiv = document.getElementById('edit-error-message');
+      errorDiv.style.display = 'none';
+    }
+
+    function hideEditMessages() {
+      document.getElementById('edit-error-message').style.display = 'none';
+      document.getElementById('edit-success-message').style.display = 'none';
+    }
+
+    let currentEmailPlayerId = null;
+    let currentEmailPlayerName = null;
+    let currentEmailAddress = null;
+
+    function sendEmail(playerId, playerName, emailAddress) {
+      currentEmailPlayerId = playerId;
+      currentEmailPlayerName = playerName;
+      currentEmailAddress = emailAddress;
+
+      // Populate the email modal
+      document.getElementById('email-player-name').textContent = playerName;
+      document.getElementById('email-address').textContent = emailAddress;
+      document.getElementById('email-subject').value = '';
+      document.getElementById('email-message').value = '';
+
+      // Show the modal
+      document.getElementById('email-modal').style.display = 'flex';
+      hideEmailMessages();
+      
+      // Focus on subject field
+      setTimeout(() => {
+        document.getElementById('email-subject').focus();
+      }, 100);
+    }
+
+    function closeEmailModal() {
+      document.getElementById('email-modal').style.display = 'none';
+      currentEmailPlayerId = null;
+      currentEmailPlayerName = null;
+      currentEmailAddress = null;
+      hideEmailMessages();
+    }
+
+    async function handleSendEmail(event) {
+      event.preventDefault();
+
+      if (!currentEmailPlayerId || !currentEmailAddress) {
+        showEmailError('Dados do jogador não encontrados.');
+        return false;
+      }
+
+      const subject = document.getElementById('email-subject').value.trim();
+      const message = document.getElementById('email-message').value.trim();
+
+      if (!subject || !message) {
+        showEmailError('Por favor, preencha o assunto e a mensagem.');
+        return false;
+      }
+
+      setEmailLoadingState(true);
+      hideEmailMessages();
+
+      try {
+        const result = await window.apiClient.sendEmail(currentEmailAddress, subject, message);
+
+        if (result.success) {
+          showEmailSuccess(result.message);
+          // Close modal after a short delay
+          setTimeout(() => {
+            closeEmailModal();
+          }, 2000);
+        } else {
+          showEmailError(result.error || 'Erro ao enviar email. Tente novamente.');
+        }
+
+      } catch (error) {
+        console.error('Error sending email:', error);
+        showEmailError('Erro de conexão. Tente novamente.');
+      } finally {
+        setEmailLoadingState(false);
+      }
+
+      return false;
+    }
+
+    function setEmailLoadingState(loading) {
+      const btn = document.getElementById('email-submit-btn');
+      const btnText = document.getElementById('email-btn-text');
+      const btnLoading = document.getElementById('email-btn-loading');
+
+      if (loading) {
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline';
+      } else {
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+      }
+    }
+
+    function showEmailError(message) {
+      const errorDiv = document.getElementById('email-error-message');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+
+      const successDiv = document.getElementById('email-success-message');
+      successDiv.style.display = 'none';
+    }
+
+    function showEmailSuccess(message) {
+      const successDiv = document.getElementById('email-success-message');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+
+      const errorDiv = document.getElementById('email-error-message');
+      errorDiv.style.display = 'none';
+    }
+
+    function hideEmailMessages() {
+      document.getElementById('email-error-message').style.display = 'none';
+      document.getElementById('email-success-message').style.display = 'none';
+    }
+
+    function setQuickEmail(subject, message) {
+      document.getElementById('email-subject').value = subject;
+      document.getElementById('email-message').value = message;
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+      checkAuth();
+      loadPlayers();
+    });
+    </script>
+  </body>
+</html>

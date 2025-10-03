@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leões Vermelhos Futsal</title>
+    <meta name="description" content="Site oficial dos Leões Vermelhos Futsal: jogos, plantel, resultados e notícias." />
+    <link rel="icon" type="image/x-icon" href="./favicon_io/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon_io/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon_io/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon_io/favicon-16x16.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a href="#" class="logo">
+          <img src="./public/logo-cfo.png" alt="CF Oeiras logo" />
+          <span>Clube Futsal de Oeiras</span>
+        </a>
+        <button class="nav-toggle" aria-label="Alternar navegação" aria-expanded="false">☰</button>
+        <nav class="site-nav" aria-label="Principal">
+          <ul>
+            <li><a href="./login.html" class="btn btn-small">Admin</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <div class="container grid-2">
+          <div class="hero-copy">
+            <h1>Tú és Oeiras!</h1>
+            <p>Bem-vindos aos Clube Futsal. Acompanhem a nossa jornada, vejam os jogos e conheçam o plantel.</p>
+            <div class="hero-cta">
+              <a href="#fixtures" class="btn">Ver próximo jogo</a>
+              <a href="#roster" class="btn btn-outline">Conhecer a equipa</a>
+            </div>
+            <div class="trust">
+              <span>Fundado em 2006</span>
+            </div>
+          </div>
+          <div class="hero-art">
+            <div class="card kpi">
+              <div class="kpi-row">
+                <span>Liga</span>
+                <strong>Regional A</strong>
+              </div>
+              <div class="kpi-row">
+                <span>Registo</span>
+                <strong>8–2–1</strong>
+              </div>
+              <div class="kpi-row">
+                <span>Golos</span>
+                <strong>47</strong>
+              </div>
+            </div>
+            <div class="chart-spark"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features" id="fixtures">
+        <div class="container">
+          <h2>Próximos jogos</h2>
+          <p class="section-sub">Encontrem-nos no campo. Jogos em casa a negrito.</p>
+          <div class="cards">
+            <article class="card">
+              <h3><strong>05 Out</strong> • Clube Futsal de Oeiras vs Leões de Porto Salvo</h3>
+              <p>Arena Central • 19:30</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="about" id="roster">
+        <div class="container grid-2">
+          <div>
+            <h2>Plantel</h2>
+            <p>Habilidade, química e pressão implacável. Conheçam o plantel dos Leões Vermelhos.</p>
+            <ul class="ticks">
+              <li>#1 • Rafael Souza • GK</li>
+              <li>#5 • Leandro Takeda • Fixo</li>
+              <li>#7 • Gabriel Lima • Ala</li>
+              <li>#9 • Marcos Vieira • Pivo</li>
+            </ul>
+          </div>
+          <div class="card quote">
+            <p>"Vemo-nos na Arena!"</p>
+            <span>— Capitão da Equipa</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="cases" id="gallery">
+        <div class="container">
+          <h2>Galeria</h2>
+          <div class="cards">
+            <article class="card">
+              <h3>Dia de Jogo</h3>
+              <p>Fotos da vitória 4–2 em casa da semana passada.</p>
+            </article>
+            <article class="card">
+              <h3>Treinos</h3>
+              <p>Exercícios de alta intensidade e prática de finalização.</p>
+            </article>
+            <article class="card">
+              <h3>Comunidade</h3>
+              <p>Sessões abertas com a nossa academia de jovens e adeptos.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact" id="join">
+        <div class="container">
+          <h2>Juntem-se ao CFO!</h2>
+          <p class="section-sub">Testes, patrocínios e eventos comunitários—entrem em contacto.</p>
+          <form class="card contact-form" name="join" netlify>
+            <div class="grid-2">
+              <label>
+                <span>Nome</span>
+                <input type="text" name="name" placeholder="O seu nome" required />
+              </label>
+              <label>
+                <span>Email</span>
+                <input type="email" name="email" placeholder="voce@empresa.com" required />
+              </label>
+            </div>
+            <label>
+              <span>Assunto</span>
+              <input type="text" name="topic" placeholder="Testes, patrocínios, media, etc." />
+            </label>
+            <label>
+              <span>Mensagem</span>
+              <textarea name="message" rows="5" placeholder="Contem-nos mais" required></textarea>
+            </label>
+            <button type="submit" class="btn">Enviar</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> CFO. Todos os direitos reservados.</p>
+        <a href="#home" class="to-top" aria-label="Voltar ao topo">↑</a>
+      </div>
+    </footer>
+
+    <script src="./script.js" defer></script>
+  </body>
+</html>
