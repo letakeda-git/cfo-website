@@ -258,12 +258,4 @@ function validateForm(form) {
     return isValid;
 }
 
-// Add error styling
-const style = document.createElement('style');
-style.textContent = `
-    .error {
-        border-color: #dc3545 !important;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
-    }
-`;
-document.head.appendChild(style);
+// Error styling is now handled by external CSS
