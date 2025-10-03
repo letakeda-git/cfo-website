@@ -36,6 +36,13 @@ app.use(helmet({
       connectSrc: ["'self'"],
       formAction: ["'self'"]
     }
+  },
+  crossOriginOpenerPolicy: { policy: "same-origin" },
+  crossOriginEmbedderPolicy: { policy: "require-corp" },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
   }
 }));
 
