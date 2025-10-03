@@ -336,7 +336,7 @@
                             <p><%= product.description %></p>
                             <div class="product-actions">
                                 <a href="/admin/products/<%= product.id %>/edit" class="btn-edit">Edit</a>
-                                <button class="btn-delete" onclick="deleteProduct(<%= product.id %>)">Delete</button>
+                                <button class="btn-delete" data-product-id="<%= product.id %>">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -351,7 +351,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Edit Product</h3>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <button class="close-modal" id="closeModalBtn">&times;</button>
             </div>
             <form id="editProductForm" enctype="multipart/form-data">
                 <div class="form-row">
