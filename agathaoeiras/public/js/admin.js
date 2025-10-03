@@ -200,6 +200,55 @@ function initializeModalClickOutside() {
     }
 }
 
+// Form submission handling
+function initializeAddProductForm() {
+    const addProductForm = document.getElementById('addProductForm');
+    if (addProductForm) {
+        addProductForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/admin/products', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Show success message
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'success-message';
+                    successDiv.textContent = 'Product added successfully!';
+                    document.querySelector('.admin-container').insertBefore(successDiv, document.querySelector('.add-product-form'));
+                    
+                    // Reset form
+                    this.reset();
+                    const imagesPreview = document.getElementById('imagesPreview');
+                    if (imagesPreview) imagesPreview.classList.add('hidden');
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                } else {
+                    // Show error message
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message';
+                    errorDiv.textContent = result.error || 'Error adding product';
+                    document.querySelector('.admin-container').insertBefore(errorDiv, document.querySelector('.add-product-form'));
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                }
+            } catch (error) {
+                console.error('Error adding product:', error);
+                alert('Error adding product. Please try again.');
+            }
+        });
+    }
+}
+
 // Initialize all event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize cancel buttons
@@ -228,6 +277,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (imageTypeSelect) {
         imageTypeSelect.addEventListener('change', toggleEditImageInput);
     }
+    
+    // Initialize add product form
+    initializeAddProductForm();
 });
 
 // Auto-save functionality

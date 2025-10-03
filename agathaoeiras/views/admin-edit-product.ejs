@@ -266,34 +266,6 @@
         <% } %>
     </div>
 
-    <script>
-        function previewImages(input) {
-            const previewGrid = document.getElementById('previewGrid');
-            const imagesPreview = document.getElementById('imagesPreview');
-            
-            // Clear previous previews
-            previewGrid.innerHTML = '';
-            
-            if (input.files && input.files.length > 0) {
-                imagesPreview.style.display = 'block';
-                
-                Array.from(input.files).forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const previewItem = document.createElement('div');
-                        previewItem.className = 'preview-item';
-                        previewItem.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview ${index + 1}">
-                            <span class="preview-label">Image ${index + 1}</span>
-                        `;
-                        previewGrid.appendChild(previewItem);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            } else {
-                imagesPreview.style.display = 'none';
-            }
-        }
-    </script>
+    <script src="/js/admin.js"></script>
 </body>
 </html>

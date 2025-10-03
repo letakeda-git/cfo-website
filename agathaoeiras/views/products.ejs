@@ -96,56 +96,5 @@
     </footer>
 
     <script src="/js/script.js"></script>
-    <script>
-        // Add to cart functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-            
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', async function() {
-                    const productId = this.getAttribute('data-product-id');
-                    const productName = this.getAttribute('data-product-name');
-                    const productPrice = this.getAttribute('data-product-price');
-                    
-                    try {
-                        const response = await fetch('/cart/add', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                productId: parseInt(productId),
-                                quantity: 1
-                            })
-                        });
-                        
-                        const result = await response.json();
-                        
-                        if (response.ok) {
-                            // Update cart count in navigation
-                            const cartCount = document.getElementById('cart-count');
-                            if (cartCount) {
-                                cartCount.textContent = result.cartItemCount;
-                            }
-                            
-                            // Show success message
-                            this.textContent = 'Added!';
-                            this.style.backgroundColor = '#28a745';
-                            
-                            setTimeout(() => {
-                                this.textContent = 'Add to Cart';
-                                this.style.backgroundColor = '';
-                            }, 2000);
-                        } else {
-                            alert('Error adding to cart: ' + (result.error || 'Unknown error'));
-                        }
-                    } catch (error) {
-                        console.error('Error adding to cart:', error);
-                        alert('Error adding to cart. Please try again.');
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>

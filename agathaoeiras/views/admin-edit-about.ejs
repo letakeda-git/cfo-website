@@ -216,19 +216,6 @@
 
     </div>
 
-    <script>
-
-        // Auto-save functionality (optional)
-        let autoSaveTimeout;
-        document.querySelectorAll('input, textarea').forEach(input => {
-            input.addEventListener('input', function() {
-                clearTimeout(autoSaveTimeout);
-                autoSaveTimeout = setTimeout(() => {
-                    // Auto-save could be implemented here
-                    console.log('Auto-save triggered');
-                }, 2000);
-            });
-        });
-    </script>
+    <script src="/js/admin.js"></script>
 </body>
 </html>

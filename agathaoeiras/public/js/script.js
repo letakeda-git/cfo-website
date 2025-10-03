@@ -40,23 +40,54 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Add to cart functionality (placeholder)
-document.querySelectorAll('.btn-primary').forEach(button => {
-    if (button.textContent.includes('Add to Cart')) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
+// Add to cart functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            const productId = this.getAttribute('data-product-id');
+            const productName = this.getAttribute('data-product-name');
+            const productPrice = this.getAttribute('data-product-price');
             
-            // Add visual feedback
-            const originalText = button.textContent;
-            button.textContent = 'Added!';
-            button.style.backgroundColor = '#28a745';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.backgroundColor = '';
-            }, 2000);
+            try {
+                const response = await fetch('/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        productId: parseInt(productId),
+                        quantity: 1
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Update cart count in navigation
+                    const cartCount = document.getElementById('cart-count');
+                    if (cartCount) {
+                        cartCount.textContent = result.cartItemCount;
+                    }
+                    
+                    // Show success message
+                    this.textContent = 'Added!';
+                    this.style.backgroundColor = '#28a745';
+                    
+                    setTimeout(() => {
+                        this.textContent = 'Add to Cart';
+                        this.style.backgroundColor = '';
+                    }, 2000);
+                } else {
+                    alert('Error adding to cart: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error adding to cart. Please try again.');
+            }
         });
-    }
+    });
 });
 
 // Form submission handling
