@@ -1246,6 +1246,60 @@ section {
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 
+/* Button success state */
+.btn-success {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+/* Image fade-in animation */
+.fade-in {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.fade-in.loaded {
+    opacity: 1;
+}
+
+/* Navbar scroll effect */
+.navbar.scrolled {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* Product card hover effect */
+.product-card.hovered {
+    transform: translateY(-5px);
+}
+
+/* Section fade-in animation */
+.fade-in-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in-section.fade-in-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Clickable images */
+.clickable-image {
+    cursor: pointer;
+}
+
+/* Modal visibility */
+.modal-visible {
+    display: flex !important;
+}
+
+/* Body modal state */
+.modal-open {
+    overflow: hidden !important;
+}
+
 /* Admin Dashboard Styles */
 .admin-header {
     background: #333;

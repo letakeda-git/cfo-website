@@ -67,11 +67,11 @@ function initializeAddToCart() {
                     
                     // Show success message
                     this.textContent = 'Added!';
-                    this.style.backgroundColor = '#28a745';
-                    
+                    this.classList.add('btn-success');
+
                     setTimeout(() => {
                         this.textContent = 'Add to Cart';
-                        this.style.backgroundColor = '';
+                        this.classList.remove('btn-success');
                     }, 2000);
                 } else {
                     alert('Error adding to cart: ' + (result.error || 'Unknown error'));

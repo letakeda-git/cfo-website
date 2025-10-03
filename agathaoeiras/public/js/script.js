@@ -73,11 +73,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Show success message
                     this.textContent = 'Added!';
-                    this.style.backgroundColor = '#28a745';
+                    this.classList.add('btn-success');
                     
                     setTimeout(() => {
                         this.textContent = 'Add to Cart';
-                        this.style.backgroundColor = '';
+                        this.classList.remove('btn-success');
                     }, 2000);
                 } else {
                     alert('Error adding to cart: ' + (result.error || 'Unknown error'));
@@ -115,11 +115,11 @@ if (contactForm) {
         
         setTimeout(() => {
             submitButton.textContent = 'Message Sent!';
-            submitButton.style.backgroundColor = '#28a745';
+            submitButton.classList.add('btn-success');
             
             setTimeout(() => {
                 submitButton.textContent = originalText;
-                submitButton.style.backgroundColor = '';
+                submitButton.classList.remove('btn-success');
                 submitButton.disabled = false;
                 this.reset();
             }, 2000);
@@ -145,21 +145,20 @@ images.forEach(img => imageObserver.observe(img));
 // Add loading animation for product images
 document.querySelectorAll('.product-image img').forEach(img => {
     // Set initial opacity to 0 for fade-in effect
-    img.style.opacity = '0';
-    img.style.transition = 'opacity 0.3s ease';
+    img.classList.add('fade-in');
     
     // Check if image is already loaded
     if (img.complete && img.naturalHeight !== 0) {
-        img.style.opacity = '1';
+        img.classList.add('loaded');
     } else {
         img.addEventListener('load', function() {
-            this.style.opacity = '1';
+            this.classList.add('loaded');
         });
         
         // Fallback: if load event doesn't fire, show image after a short delay
         setTimeout(() => {
-            if (img.style.opacity === '0') {
-                img.style.opacity = '1';
+            if (!img.classList.contains('loaded')) {
+                img.classList.add('loaded');
             }
         }, 1000);
     }
@@ -190,22 +189,20 @@ filterButtons.forEach(button => {
 window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
     if (window.scrollY > 100) {
-        navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-        navbar.style.backdropFilter = 'blur(10px)';
+        navbar.classList.add('scrolled');
     } else {
-        navbar.style.backgroundColor = '#fff';
-        navbar.style.backdropFilter = 'none';
+        navbar.classList.remove('scrolled');
     }
 });
 
 // Product card hover effects
 document.querySelectorAll('.product-card').forEach(card => {
     card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-5px)';
+        this.classList.add('hovered');
     });
     
     card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
+        this.classList.remove('hovered');
     });
 });
 
@@ -218,17 +215,14 @@ const observerOptions = {
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
+            entry.target.classList.add('fade-in-visible');
         }
     });
 }, observerOptions);
 
 // Observe all sections for fade-in effect
 document.querySelectorAll('section').forEach(section => {
-    section.style.opacity = '0';
-    section.style.transform = 'translateY(20px)';
-    section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    section.classList.add('fade-in-section');
     observer.observe(section);
 });
 
@@ -249,20 +243,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add click event to all product images
     document.querySelectorAll('.product-image img, .product-images img, .main-image-container img').forEach(img => {
-        img.style.cursor = 'pointer';
+        img.classList.add('clickable-image');
         img.addEventListener('click', function() {
             const modalImg = modal.querySelector('.modal-image');
             modalImg.src = this.src;
             modalImg.alt = this.alt;
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            modal.classList.add('modal-visible');
+            document.body.classList.add('modal-open');
         });
     });
 
     // Close modal functionality
     const closeModal = () => {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        modal.classList.remove('modal-visible');
+        document.body.classList.remove('modal-open');
     };
 
     modal.querySelector('.modal-close').addEventListener('click', closeModal);
@@ -274,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close modal with Escape key
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.style.display === 'flex') {
+        if (e.key === 'Escape' && modal.classList.contains('modal-visible')) {
             closeModal();
         }
     });
